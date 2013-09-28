@@ -7,11 +7,14 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".Main" >
-
-    <ListView
-        android:id="@+id/listView1"
+    <TextView 
+        android:id="@+id/event_textview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
-
+        android:layout_height="match_parent"
+        android:text="@string/event_hello_event"/>
+    <EditText 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:enabled="false"
+        android:inputType="text"/>
 </RelativeLayout>

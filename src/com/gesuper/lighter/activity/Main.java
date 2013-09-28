@@ -1,10 +1,12 @@
-package com.example.lighter;
+package com.gesuper.lighter.activity;
+
+import com.example.lighter.R;
 
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 
-public class MainActivity extends Activity {
+public class Main extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
