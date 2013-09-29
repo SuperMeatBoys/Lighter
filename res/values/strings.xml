@@ -4,6 +4,7 @@
     <string name="app_name">Lighter</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    
 	<string name="event_hello_event">Hello Event !</string>
 	
 	<string name="case_hello_case">Hello Case !</string>
