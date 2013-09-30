@@ -1,35 +1,42 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:baselineAligned="false"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="right"
     android:orientation="horizontal"
     tools:context=".Main" >
+    <ImageView
+        android:id="@+id/image_check"
+        android:layout_width="@dimen/item_height"
+        android:layout_height="@dimen/item_height"
+        android:contentDescription="@string/check_description"
+        android:src="@drawable/check" />
     
-    <FrameLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="10"
-        android:padding="10dp" >
-        <EditText
-        	android:id="@+id/case_content"
-        	android:layout_width="match_parent"
-        	android:layout_height="wrap_content"
-        	android:inputType="none"
-        	android:textSize="18sp"
-        	android:background="@null"
-        	android:text="@string/case_hello_case"/>
-    </FrameLayout>
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="8dp" >
-        <TextView
-        	android:id="@+id/case_count"
-        	android:layout_width="match_parent"
-        	android:layout_height="wrap_content"
-        	android:textSize="18sp"
-        	android:text="15"/>
-    </FrameLayout>
-</LinearLayout>
+    <ImageView
+        android:id="@+id/image_cross"
+        android:layout_width="@dimen/item_height"
+        android:layout_height="@dimen/item_height"
+        android:layout_gravity="right"
+        android:contentDescription="@string/cross_description"
+        android:src="@drawable/cross" />
+
+    <LinearLayout 
+        android:id="@+id/case_linear"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        android:background="#FFFFFF"
+    	android:orientation="horizontal">
+	    <EditText
+	      	android:id="@+id/case_content"
+	       	android:layout_width="0dp"
+	       	android:layout_height="wrap_content"
+	       	android:layout_weight="10"
+	       	android:ellipsize="end"
+			android:singleLine="true"
+	       	android:padding="@dimen/item_padding"
+	       	android:inputType="none"
+	       	android:textSize="@dimen/item_text_size"
+	       	android:background="@null"
+	       	android:text="@string/case_hello_case"/>
+	</LinearLayout>
+</FrameLayout>
