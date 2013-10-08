@@ -1,18 +1,54 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:baselineAligned="false"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="horizontal"
     tools:context=".Main" >
-    <FrameLayout
+    
+    <ImageView
+        android:id="@+id/image_check"
+        android:layout_width="@dimen/item_height"
+        android:layout_height="@dimen/item_height"
+        android:contentDescription="@string/check_description"
+        android:src="@drawable/check" />
+    
+    <ImageView
+        android:id="@+id/image_cross"
+        android:layout_width="@dimen/item_height"
+        android:layout_height="@dimen/item_height"
+        android:layout_gravity="right"
+        android:contentDescription="@string/cross_description"
+        android:src="@drawable/cross" />
+
+    <LinearLayout 
+        android:id="@+id/event_linear"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp" >
-        <TextView
-        	android:id="@+id/case_content"
-        	android:layout_width="match_parent"
-        	android:layout_height="wrap_content"
-        	android:textSize="18sp"
-        	android:text="@string/case_hello_case"/>
-    </FrameLayout>
-</LinearLayout>
+        android:layout_height="@dimen/item_height"
+        android:background="#FFFFFF"
+    	android:orientation="horizontal">
+
+	    <EditText
+	      	android:id="@+id/event_content"
+	       	android:layout_width="0dp"
+	       	android:layout_height="wrap_content"
+	       	android:layout_weight="10"
+	       	android:textStyle="bold"
+	       	android:ellipsize="end"
+			android:singleLine="true"
+	       	android:padding="@dimen/item_padding"
+	       	android:inputType="none"
+	       	android:textSize="@dimen/item_text_size"
+	       	android:background="@null"
+	       	android:text="@string/event_hello_event"/>
+		
+	    <TextView
+	       	android:id="@+id/event_count"
+	       	android:layout_width="60dp"
+	       	android:layout_height="wrap_content"
+	       	android:textStyle="bold"
+	       	android:padding="18dp"
+	       	android:textSize="20sp"
+	       	android:text="@string/event_count"/>
+    </LinearLayout>
+</FrameLayout>

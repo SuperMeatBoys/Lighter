@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Lighter</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="cross_description">cross</string>
+    <string name="check_description">check</string>
+    <string name="arrow_description">arrow</string>
     
 	<string name="event_hello_event">Hello Event !</string>
+	<string name="event_count">15</string>
+	<string name="event_pull_create">Pull to Create Event</string>
+	<string name="event_release_create">Release to Create Event</string>
 	
 	<string name="case_hello_case">Hello Case !</string>
+	<string name="case_switch_list">Switch to List</string>
+	<string name="case_pull_create">Pull to Create Item</string>
+	<string name="case_release_create">Release to Create Item</string>
 </resources>

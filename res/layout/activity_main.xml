@@ -2,13 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
     tools:context=".Main" >
 
-    <ListView
+    <com.gesuper.lighter.view.EventListView 
         android:id="@+id/event_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:entries="@layout/event_item" >
-    </ListView>
-
+    </com.gesuper.lighter.view.EventListView >
+	
 </RelativeLayout>
