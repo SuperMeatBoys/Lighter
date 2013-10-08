@@ -10,6 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:entries="@layout/event_item" >
+<<<<<<< HEAD
     </com.gesuper.lighter.view.EventListView >
+=======
+    </ListView>
+>>>>>>> 169c4c3b2cacc42b69103266ba07896518bdb549
 	
 </RelativeLayout>
