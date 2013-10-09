@@ -33,10 +33,9 @@ public class MoveableListView extends ListView implements OnTouchListener, OnGes
 	private Context mContext;
 	private GestureDetector mGesture;
 	
-	// 用来设置箭头图标动画效果   
+	//
     private RotateAnimation animation;  
     private RotateAnimation reverseAnimation;
-    
 	private LinearLayout mHeadView;
 	private ImageView mHeadImage;
 	private TextView mHeadText;
@@ -88,8 +87,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnGes
 		this.mHeadView.setPadding(this.mHeadView.getPaddingLeft(), -1 * this.mHeadHeight, this.mHeadView.getPaddingRight(), this.mHeadView.getPaddingBottom());
 		this.mHeadView.invalidate();
 		this.addHeaderView(this.mHeadView);
-		
-		
 	}
 	
 	private void changeHeadViewByStatus(int status){
@@ -111,11 +108,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnGes
 		case DONE:
 			mHeadView.setPadding(mHeadView.getPaddingLeft(), -1 * mHeadHeight, mHeadView.getPaddingRight(), mHeadView.getPaddingBottom());  
 			mHeadView.invalidate();  
-   
             this.mHeadImage.clearAnimation();  
-            // 此处更换图标   
             this.mHeadImage.setImageResource(R.drawable.arrow);  
-  
             this.mHeadText.setText(R.string.event_pull_create);
 		}
 	}
@@ -123,6 +117,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnGes
 	@Override
 	public boolean onDown(MotionEvent e) {
 		// TODO Auto-generated method stub
+		MotionEvent.obtain(e);
 		return false;
 	}
 	@Override
