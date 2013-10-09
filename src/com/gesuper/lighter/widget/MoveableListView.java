@@ -1,4 +1,4 @@
-package com.gesuper.lighter.view;
+package com.gesuper.lighter.widget;
 
 import com.gesuper.lighter.R;
 
