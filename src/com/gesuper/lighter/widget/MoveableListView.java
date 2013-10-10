@@ -117,7 +117,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnGes
 	@Override
 	public boolean onDown(MotionEvent e) {
 		// TODO Auto-generated method stub
-		MotionEvent.obtain(e);
+		
 		return false;
 	}
 	@Override
