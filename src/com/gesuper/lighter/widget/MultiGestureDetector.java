@@ -1,4 +1,4 @@
-package com.gesuper.lighter.tools;
+package com.gesuper.lighter.widget;
 
 import android.os.Handler;
 import android.os.Message;

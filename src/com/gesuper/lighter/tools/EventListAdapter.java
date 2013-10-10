@@ -3,7 +3,7 @@ package com.gesuper.lighter.tools;
 import java.util.List;
 
 import com.gesuper.lighter.model.EventModel;
-import com.gesuper.lighter.view.EventItemView;
+import com.gesuper.lighter.ui.EventItemView;
 
 import android.content.Context;
 import android.view.View;

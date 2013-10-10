@@ -1,18 +1,26 @@
-package com.gesuper.lighter.activity;
+package com.gesuper.lighter.ui;
 
-import com.gesuper.lighter.view.MainView;
+import com.gesuper.lighter.R;
 
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 
 public class MainActivity extends Activity {
-	private MainView mView;
+	
+	private EventListView mEventList;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.mView = new MainView(this);
-		setContentView(this.mView);
+		setContentView(R.layout.activity_main);
+		this.initResource();
+	}
+
+	private void initResource() {
+		// TODO Auto-generated method stub
+		this.mEventList = (EventListView) this.findViewById(R.id.event_list);
+		this.mEventList.initResource();
 	}
 
 	@Override
