@@ -5,11 +5,20 @@
     android:background="#000000"
     tools:context=".Main" >
 
+<<<<<<< HEAD
     <com.gesuper.lighter.widget.MoveableListView 
         android:id="@+id/event_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:entries="@layout/event_item" >
+=======
+    <com.gesuper.lighter.widget.MoveableListView
+        android:id="@+id/event_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@null" >
+
+>>>>>>> 5126d5b19bf38ebd3276b5e1d48551ca54a782c1
     </com.gesuper.lighter.widget.MoveableListView>
 
 </RelativeLayout>

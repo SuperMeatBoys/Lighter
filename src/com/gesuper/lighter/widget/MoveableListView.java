@@ -1,16 +1,30 @@
 package com.gesuper.lighter.widget;
 
 import com.gesuper.lighter.R;
+<<<<<<< HEAD
+=======
+import com.gesuper.lighter.ui.EventItemView;
+import com.gesuper.lighter.ui.MainActivity;
+>>>>>>> 5126d5b19bf38ebd3276b5e1d48551ca54a782c1
 import com.gesuper.lighter.widget.MultiGestureDetector.MultiMotionEvent;
 import com.gesuper.lighter.widget.MultiGestureDetector.OnMultiGestureListener;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+<<<<<<< HEAD
+=======
+import android.graphics.Rect;
+import android.os.Handler;
+import android.os.Message;
+>>>>>>> 5126d5b19bf38ebd3276b5e1d48551ca54a782c1
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -29,9 +43,15 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	public final static int DONE = 3;
 	
 	private LayoutInflater mInflater;
+<<<<<<< HEAD
 	private Context mContext;
 	private MultiGestureDetector mGesture;
 	
+=======
+	private Context context;
+	private MultiGestureDetector mGesture;
+
+>>>>>>> 5126d5b19bf38ebd3276b5e1d48551ca54a782c1
 	//
     private RotateAnimation animation;  
     private RotateAnimation reverseAnimation;
@@ -41,6 +61,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	private int mHeadWidth;
 	private int mHeadHeight;
 	
+<<<<<<< HEAD
 	private int mStartX;
 	private int mStartY;
 	
@@ -49,12 +70,35 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	    super(context, attrs);
 	    // TODO Auto-generated constructor stub
 
+=======
+	private View mFootText;
+	private int mStartX;
+	private int mStartY;
+	public MoveableListView(Context context) {
+		super(context);
+		// TODO Auto-generated constructor stub
+		this.context = context;
+		this.initResource();
 	}
 	
-	private void initResourse() {
+	public MoveableListView(Context context, AttributeSet attrs){
+		super(context, attrs);
+		// TODO Auto-generated constructor stub
+		this.context = context;
+		this.initResource();
+>>>>>>> 5126d5b19bf38ebd3276b5e1d48551ca54a782c1
+	}
+	
+	public void initResource() {
 		// TODO Auto-generated method stub
+<<<<<<< HEAD
 		this.mInflater = LayoutInflater.from(this.mContext);
 		this.mGesture = new MultiGestureDetector(this.mContext, this);
+=======
+		this.setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS );
+		this.mInflater = LayoutInflater.from(this.context);
+		this.mGesture = new MultiGestureDetector(this.context, this);
+>>>>>>> 5126d5b19bf38ebd3276b5e1d48551ca54a782c1
 		this.mGesture.setIsLongpressEnabled(false);
 		
 		animation = new RotateAnimation(0, -180,  
@@ -72,7 +116,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
         reverseAnimation.setFillAfter(true);
         
 		//init for head view
-		this.mHeadView = (LinearLayout) this.mInflater.inflate(R.layout.listview_head, null);
+		this.mHeadView = (LinearLayout) this.mInflater.inflate(R.layout.event_head, null);
 		this.mHeadImage = (ImageView) this.mHeadView.findViewById(R.id.head_image);
 		this.mHeadText = (TextView) this.mHeadView.findViewById(R.id.head_text);
 		this.measureView(this.mHeadView);
@@ -81,6 +125,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.mHeadView.setPadding(this.mHeadView.getPaddingLeft(), -1 * this.mHeadHeight, this.mHeadView.getPaddingRight(), this.mHeadView.getPaddingBottom());
 		this.mHeadView.invalidate();
 		this.addHeaderView(this.mHeadView);
+		
+		View v = this.mInflater.inflate(R.layout.list_footer, null);
+		mFootText = (TextView) v.findViewById(R.id.list_foot_text);
+		this.addFooterView(v);
 	}
 	
 	private void changeHeadViewByStatus(int status){
@@ -108,10 +156,23 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		}
 	}
 	
+	@SuppressLint("NewApi")
+	private void scrollItemToTop(int position){
+		//ViewGroup.LayoutParams p = this.mFootText.getLayoutParams();
+		//p.width = ((MainActivity)this.context).screenWidth;
+		//p.height = ((MainActivity)this.context).screenHeight;
+		//this.mFootText.setLayoutParams(p);
+		this.smoothScrollToPositionFromTop(position, 0);
+	}
+	
 	@Override
 	public boolean onDown(MultiMotionEvent e) {
 		// TODO Auto-generated method stub
+<<<<<<< HEAD
 		Log.v(TAG, "onDown");
+=======
+		Log.v(TAG, "onDown " + e.getX() + " " + e.getY());
+>>>>>>> 5126d5b19bf38ebd3276b5e1d48551ca54a782c1
 		return false;
 	}
 	
@@ -124,7 +185,23 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	@Override
 	public boolean onSingleTapUp(MultiMotionEvent e) {
 		// TODO Auto-generated method stub
+<<<<<<< HEAD
 		Log.v(TAG, "onSingleTapUp");
+=======
+		int position = this.pointToPosition((int)e.getOffsetX(), (int)e.getOffsetY());
+		Log.v(TAG, "onSingleTapUp " + position);
+		EventItemView view = (EventItemView) this.getChildAt(position - this.getFirstVisiblePosition());
+		
+		if(view instanceof OnItemFocusListener){
+			if(view.isNeedFocus((int)e.getOffsetX(), (int)e.getOffsetY() - view.getTop())){
+				scrollItemToTop(position);
+			}
+		}
+		if(position < 0){
+			//create new item at bottom
+			
+		} 
+>>>>>>> 5126d5b19bf38ebd3276b5e1d48551ca54a782c1
 		return false;
 	}
 	
@@ -132,7 +209,11 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	public boolean onScroll(MultiMotionEvent e1, MultiMotionEvent e2, float distanceX,
 			float distanceY) {
 		// TODO Auto-generated method stub
+<<<<<<< HEAD
 		Log.v(TAG, "onScroll");
+=======
+		// Log.v(TAG, "onScroll " + e2.getX() + " " + e2.getY());
+>>>>>>> 5126d5b19bf38ebd3276b5e1d48551ca54a782c1
 		return false;
 	}
 	
@@ -146,7 +227,11 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	public boolean onFling(MultiMotionEvent e1, MultiMotionEvent e2, float velocityX,
 			float velocityY) {
 		// TODO Auto-generated method stub
+<<<<<<< HEAD
 		Log.v(TAG, "onFling");
+=======
+		Log.v(TAG, "onFling " + e2.getX() + " " + e2.getY());
+>>>>>>> 5126d5b19bf38ebd3276b5e1d48551ca54a782c1
 		return false;
 	}
 	
@@ -175,6 +260,15 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
                     MeasureSpec.UNSPECIFIED);  
         }  
         child.measure(childWidthSpec, childHeightSpec);  
-    }  
-
+    }
+	
+	public interface OnItemFocusListener{
+		Rect focusRect = new Rect();
+		public void calcFocusRect();
+		public boolean isNeedFocus(int x, int y);
+		public void onFocus();
+		public void outFocus();
+	}
 }
+
+

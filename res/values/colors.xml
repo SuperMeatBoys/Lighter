@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="text_color">#FFFFFFFF</color>
+    <color name="item_event_bg">#FF1780F7</color>
+    <color name="item_count_bg">#2AFFFFFF</color>
+    <color name="list_divider">#19FFFFFF</color>
+    <color name="activity_bg">#FF000000</color>
+</resources>

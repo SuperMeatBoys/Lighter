@@ -94,14 +94,24 @@ public class MultiGestureDetector {
         }  
   
         // 返回X的绝对坐标  
-        public float getX() {  
+        public float getX() {
             return mEvent.getX(mIndex) + mEvent.getRawX() - mEvent.getX();  
         }  
   
         // 返回Y的绝对坐标  
         public float getY() {  
             return mEvent.getY(mIndex) + mEvent.getRawY() - mEvent.getY();  
+        }
+        
+        // 返回X的绝对坐标  
+        public float getOffsetX() {
+            return mEvent.getX(mIndex);  
         }  
+  
+        // 返回Y的绝对坐标  
+        public float getOffsetY() {  
+            return mEvent.getY(mIndex);  
+        }
   
         // 事件发生的时间  
         public long getEventTime() {  
