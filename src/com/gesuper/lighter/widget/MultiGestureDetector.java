@@ -94,14 +94,24 @@ public class MultiGestureDetector {
         }  
   
         // 返回X的绝对坐标  
-        public float getX() {  
+        public float getX() {
             return mEvent.getX(mIndex) + mEvent.getRawX() - mEvent.getX();  
         }  
   
         // 返回Y的绝对坐标  
         public float getY() {  
             return mEvent.getY(mIndex) + mEvent.getRawY() - mEvent.getY();  
+        }
+        
+        // 返回X的绝对坐标  
+        public float getOffsetX() {
+            return mEvent.getX(mIndex);  
         }  
+  
+        // 返回Y的绝对坐标  
+        public float getOffsetY() {  
+            return mEvent.getY(mIndex);  
+        }
   
         // 事件发生的时间  
         public long getEventTime() {  
@@ -127,7 +137,7 @@ public class MultiGestureDetector {
         }  
     } 
     
-	public interface onMultiGestureListener {
+	public interface OnMultiGestureListener {
 		/**
 		 * 手指触摸屏幕，由ACTION_DOWN, ACTION_POINTER_DOWN触发
 		 * @param e
@@ -202,7 +212,7 @@ public class MultiGestureDetector {
     // 手势处理器  
     private final MultiGestureHandler mHandler;  
     // 手势监听器  
-    private final onMultiGestureListener mListener;
+    private final OnMultiGestureListener mListener;
   
     // 长按允许阀值  
     private boolean mIsLongpressEnabled;  
@@ -268,7 +278,7 @@ public class MultiGestureDetector {
      * @param context 
      * @param listener 
      */  
-    public MultiGestureDetector(Context context, onMultiGestureListener listener) {  
+    public MultiGestureDetector(Context context, OnMultiGestureListener listener) {  
         this(context, listener, null);  
     }  
   
@@ -278,7 +288,7 @@ public class MultiGestureDetector {
      * @param listener 
      * @param handler 
      */  
-    public MultiGestureDetector(Context context, onMultiGestureListener listener, Handler handler) {  
+    public MultiGestureDetector(Context context, OnMultiGestureListener listener, Handler handler) {  
         if (handler != null) {  
             mHandler = new MultiGestureHandler(handler);  
         } else {  

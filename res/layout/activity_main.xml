@@ -5,11 +5,12 @@
     android:background="#000000"
     tools:context=".Main" >
 
-    <com.gesuper.lighter.ui.EventListView 
+    <com.gesuper.lighter.widget.MoveableListView
         android:id="@+id/event_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:entries="@layout/event_item" >
-    </com.gesuper.lighter.ui.EventListView>
+        android:layout_height="match_parent"
+        android:divider="@null" >
+
+    </com.gesuper.lighter.widget.MoveableListView>
 
 </RelativeLayout>

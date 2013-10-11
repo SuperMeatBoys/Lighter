@@ -6,31 +6,51 @@ import com.gesuper.lighter.model.EventModel;
 import com.gesuper.lighter.ui.EventItemView;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 
-public class EventListAdapter extends ArrayAdapter<EventModel>{
+public class EventListAdapter extends BaseAdapter{
 	public static final String TAG = "EventListAdapter";
 	
+	private List<EventModel> listItems;
+	private Context context;
+	private int resourceId;
 	public EventListAdapter(Context context, int textViewResourceId, List<EventModel> objects) {
-		super(context, textViewResourceId);
-		// TODO Auto-generated constructor stub
+		this.context = context;
+		this.resourceId = textViewResourceId;
+		this.listItems = objects;
 	}
-	
+
+	@Override
+	public int getCount() {
+		// TODO Auto-generated method stub
+		return this.listItems.size();
+	}
+
+	@Override
+	public Object getItem(int index) {
+		// TODO Auto-generated method stub
+		return this.listItems.get(index);
+	}
+
+	@Override
+	public long getItemId(int arg0) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent){
 		EventItemView mItemView;
 		if(convertView != null){
 			mItemView = (EventItemView) convertView;
 		}
-		else mItemView  = new EventItemView(this.getContext());
+		else mItemView  = new EventItemView(this.context);
 
-		EventModel mItemModel = getItem(position);
+		EventModel mItemModel = this.listItems.get(position);
 		mItemView.setModel(mItemModel);
-		if(mItemView.getModel().getId() == -1){
-			mItemView.setPadding(0, - mItemView.getMHeight(), 0, 0);
-		}
         return mItemView;
 	}
 

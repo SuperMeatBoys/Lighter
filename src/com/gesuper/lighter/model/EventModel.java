@@ -16,7 +16,11 @@ public class EventModel {
 		EventModel.MODIFY_DATE, EventModel.CONTENT,
 		EventModel.SEQUENCE
 	};
-
+	private int id;
+	private long createDate;
+	private long modifyDate;
+	private String content;
+	private int sequence;
 	public EventModel(Context context) {
 		// TODO Auto-generated constructor stub
 	}
@@ -24,5 +28,16 @@ public class EventModel {
 	public EventModel(Context context, Cursor cursor) {
 		// TODO Auto-generated constructor stub
 	}
-
+	
+	public EventModel(Context context, String content){
+		this.id = -1;
+		this.createDate = System.currentTimeMillis();
+		this.modifyDate = System.currentTimeMillis();
+		this.content = content;
+		this.sequence = 0;
+	}
+	
+	public String getContent(){
+		return this.content;
+	}
 }

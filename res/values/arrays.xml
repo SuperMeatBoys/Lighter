@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="example_adapter_value">
+        <item >Tom</item>
+        <item >Jerry</item>
+        <item >Green</item>
+        <item >Jack</item>
+        <item >Mary</item>
+        <item >2Tom</item>
+        <item >2Jerry</item>
+        <item >2Green</item>
+        <item >2Jack</item>
+        <item >2Mary</item>
+        <item >3Tom</item>
+        <item >3Jerry</item>
+        <item >3Green</item>
+        <item >3Jack</item>
+        <item >3Mary</item>
+    </string-array>
+    
+</resources>

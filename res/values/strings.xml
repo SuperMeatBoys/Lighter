@@ -9,6 +9,7 @@
     
 	<string name="event_hello_event">Hello Event !</string>
 	<string name="event_count">15</string>
+	<string name="event_head_count">0</string>
 	<string name="event_pull_create">Pull to Create Event</string>
 	<string name="event_release_create">Release to Create Event</string>
 	
