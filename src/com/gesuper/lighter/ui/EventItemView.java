@@ -73,6 +73,7 @@ public class EventItemView extends FrameLayout implements OnItemFocusListener{
 	@Override
 	public boolean isNeedFocus(int x, int y) {
 		// TODO Auto-generated method stub
+		this.calcFocusRect();
 		if(focusRect.contains(x, y)){
 			return true;
 		}

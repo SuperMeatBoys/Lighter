@@ -447,9 +447,9 @@ public class MultiGestureDetector {
                     Log.e(TAG, "ACTION_MOVE, idx=" + rIdx + ", Info = null");  
                     break;  
                 }  
-                if (info.mInLongPress) {    // 长按，则不处理move事件  
-                    break;  
-                }
+                //if (info.mInLongPress) {    // 长按，则不处理move事件  
+                //    break;  
+                //}
                 // 当前坐标  
                 float x = e.getX();  
                 float y = e.getY();  
