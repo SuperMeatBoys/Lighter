@@ -1,13 +1,12 @@
 package com.gesuper.lighter.widget;
 
 import com.gesuper.lighter.R;
+import com.gesuper.lighter.widget.MultiGestureDetector.MultiMotionEvent;
+import com.gesuper.lighter.widget.MultiGestureDetector.OnMultiGestureListener;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Message;
+import android.util.AttributeSet;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,7 +19,7 @@ import android.view.View.OnTouchListener;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 
-public class MoveableListView extends ListView implements OnTouchListener, OnGestureListener{
+public class MoveableListView extends ListView implements OnTouchListener, OnMultiGestureListener{
 	public static final String TAG = "MoveableListView";
 	
 	//status code for head view
@@ -31,7 +30,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnGes
 	
 	private LayoutInflater mInflater;
 	private Context mContext;
-	private GestureDetector mGesture;
+	private MultiGestureDetector mGesture;
 	
 	//
     private RotateAnimation animation;  
@@ -42,25 +41,20 @@ public class MoveableListView extends ListView implements OnTouchListener, OnGes
 	private int mHeadWidth;
 	private int mHeadHeight;
 	
-	private Handler touchMessageHandler = new Handler(){
-		public void handleMessage(Message m){
-			Log.v(TAG, "message: " + m.what);
-		}
-	};
-	
 	private int mStartX;
 	private int mStartY;
-	public MoveableListView(Context context) {
-		super(context);
-		// TODO Auto-generated constructor stub
-		this.mContext = context;
-		this.initResourse();
+	
+	
+	public MoveableListView(Context context, AttributeSet attrs) {
+	    super(context, attrs);
+	    // TODO Auto-generated constructor stub
+
 	}
 	
 	private void initResourse() {
 		// TODO Auto-generated method stub
 		this.mInflater = LayoutInflater.from(this.mContext);
-		this.mGesture = new GestureDetector(this.mContext, this);
+		this.mGesture = new MultiGestureDetector(this.mContext, this);
 		this.mGesture.setIsLongpressEnabled(false);
 		
 		animation = new RotateAnimation(0, -180,  
@@ -115,38 +109,47 @@ public class MoveableListView extends ListView implements OnTouchListener, OnGes
 	}
 	
 	@Override
-	public boolean onDown(MotionEvent e) {
+	public boolean onDown(MultiMotionEvent e) {
 		// TODO Auto-generated method stub
-		
+		Log.v(TAG, "onDown");
 		return false;
 	}
+	
 	@Override
-	public void onShowPress(MotionEvent e) {
+	public void onShowPress(MultiMotionEvent e) {
 		// TODO Auto-generated method stub
-		
+		Log.v(TAG, "onShowPress");
 	}
+	
 	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
+	public boolean onSingleTapUp(MultiMotionEvent e) {
 		// TODO Auto-generated method stub
+		Log.v(TAG, "onSingleTapUp");
 		return false;
 	}
+	
 	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+	public boolean onScroll(MultiMotionEvent e1, MultiMotionEvent e2, float distanceX,
 			float distanceY) {
 		// TODO Auto-generated method stub
+		Log.v(TAG, "onScroll");
 		return false;
 	}
+	
 	@Override
-	public void onLongPress(MotionEvent e) {
+	public void onLongPress(MultiMotionEvent e) {
 		// TODO Auto-generated method stub
-		
+		Log.v(TAG, "onLongPress");
 	}
+	
 	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+	public boolean onFling(MultiMotionEvent e1, MultiMotionEvent e2, float velocityX,
 			float velocityY) {
 		// TODO Auto-generated method stub
+		Log.v(TAG, "onFling");
 		return false;
 	}
+	
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		// TODO Auto-generated method stub

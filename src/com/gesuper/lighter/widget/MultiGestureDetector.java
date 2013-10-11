@@ -127,7 +127,7 @@ public class MultiGestureDetector {
         }  
     } 
     
-	public interface onMultiGestureListener {
+	public interface OnMultiGestureListener {
 		/**
 		 * 手指触摸屏幕，由ACTION_DOWN, ACTION_POINTER_DOWN触发
 		 * @param e
@@ -202,7 +202,7 @@ public class MultiGestureDetector {
     // 手势处理器  
     private final MultiGestureHandler mHandler;  
     // 手势监听器  
-    private final onMultiGestureListener mListener;
+    private final OnMultiGestureListener mListener;
   
     // 长按允许阀值  
     private boolean mIsLongpressEnabled;  
@@ -268,7 +268,7 @@ public class MultiGestureDetector {
      * @param context 
      * @param listener 
      */  
-    public MultiGestureDetector(Context context, onMultiGestureListener listener) {  
+    public MultiGestureDetector(Context context, OnMultiGestureListener listener) {  
         this(context, listener, null);  
     }  
   
@@ -278,7 +278,7 @@ public class MultiGestureDetector {
      * @param listener 
      * @param handler 
      */  
-    public MultiGestureDetector(Context context, onMultiGestureListener listener, Handler handler) {  
+    public MultiGestureDetector(Context context, OnMultiGestureListener listener, Handler handler) {  
         if (handler != null) {  
             mHandler = new MultiGestureHandler(handler);  
         } else {  
