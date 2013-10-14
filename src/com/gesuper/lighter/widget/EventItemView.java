@@ -1,14 +1,13 @@
-package com.gesuper.lighter.ui;
+package com.gesuper.lighter.widget;
 
 import com.gesuper.lighter.R;
 import com.gesuper.lighter.model.EventModel;
+import com.gesuper.lighter.ui.MainActivity;
 import com.gesuper.lighter.widget.MoveableListView.OnItemFocusListener;
-import com.gesuper.lighter.widget.MultiGestureDetector.MultiMotionEvent;
 
 import android.content.Context;
-import android.graphics.Rect;
+import android.graphics.Paint;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -96,5 +95,14 @@ public class EventItemView extends FrameLayout implements OnItemFocusListener{
 		
 		this.calcFocusRect();
 	}
+	
+	public LinearLayout getContentLearLayout(){
+		return this.mEventLinear;
+	}
 
+	public void finishEvent() {
+		// TODO Auto-generated method stub
+		Log.v(TAG, "finish event");
+		this.mEventContentTv.getPaint().setFlags(Paint. STRIKE_THRU_TEXT_FLAG );
+	}
 }

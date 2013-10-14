@@ -28,6 +28,7 @@
         android:layout_height="@dimen/item_height"
         android:background="@drawable/item_bg"
         android:orientation="horizontal" >
+
 		<FrameLayout 
 		    android:layout_width="0dp"
 	        android:layout_height="wrap_content"

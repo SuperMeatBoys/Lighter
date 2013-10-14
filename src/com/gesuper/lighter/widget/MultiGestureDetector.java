@@ -416,7 +416,9 @@ public class MultiGestureDetector {
                 // 触发滑动事件  
                 if ((Math.abs(velocityY) > mMinimumFlingVelocity) || (Math.abs(velocityX) > mMinimumFlingVelocity)) {  
                     handled = mListener.onFling(info.mCurrentDownEvent, currentUpEvent, velocityX, velocityY);  
-                }  
+                }else {
+                	handled = mListener.onSingleTapUp(currentUpEvent);// 触发onSingleTapUp事件  
+                }
             }  
             // Hold the event we obtained above - listeners may have changed the  
             // original.  
