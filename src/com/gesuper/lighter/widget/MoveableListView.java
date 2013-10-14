@@ -3,26 +3,29 @@ package com.gesuper.lighter.widget;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gesuper.lightclock.view.AlertItemView;
 import com.gesuper.lighter.R;
 import com.gesuper.lighter.widget.MultiGestureDetector.MultiMotionEvent;
 import com.gesuper.lighter.widget.MultiGestureDetector.OnMultiGestureListener;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Rect;
+import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.view.inputmethod.InputMethodManager;
 import android.view.View.OnTouchListener;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
@@ -42,26 +45,43 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	public final int HANDLE_HEAD = 1;
 	public final int HANDLE_ITEM = 2;
 	public final int HANDLE_LONGPRESS = 3;
+	public final int HANDLE_EDITING = 4;
 	
+	private int screenWidth;
+	private int screenHeight;
 	private LayoutInflater mInflater;
 	private Context context;
 	private MultiGestureDetector mGesture;
 	private List<TouchEvent> touchEvents;
 	private int status;
-	//
+	
+	//field for create new 
 	private LinearLayout mHeadView;
 	private EditText mHeadText;
 	//private int mHeadWidth;
 	private int mHeadHeight;
 	private int headStatus;
-	private int itemStatus;
-	
-	private View mFootText;
-
-	private AlphaAnimation alphaAnimation;
 	private TranslateAnimation translateAnimation;
-
-	private EventItemView currentItem;
+	
+	// field for item 
+	private int itemStatus;
+	private ItemViewBase currentItem;
+	private int scrollY;
+	private View mFootText;
+	
+	//field for long press
+	private WindowManager mWindowManager;
+    private WindowManager.LayoutParams mWindowParams;
+	private Bitmap mDragBitmap;
+	private ImageView mDragView;
+    private ItemViewBase mDragItemView;
+	private int mDragCurrentPostion;
+	private int mDragOffSetY;
+	private int mDragPointX;
+	private int mDragPointY;
+	private int mUpperBound;
+	private int mLowerBound;
+	
 	public MoveableListView(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
@@ -76,8 +96,12 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.initResource();
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void initResource() {
 		// TODO Auto-generated method stub
+		WindowManager wm = (WindowManager) this.context.getSystemService(Context.WINDOW_SERVICE);
+	    screenWidth = wm.getDefaultDisplay().getWidth();
+	    screenHeight = wm.getDefaultDisplay().getHeight();
 		this.setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS );
 		this.mInflater = LayoutInflater.from(this.context);
 		this.mGesture = new MultiGestureDetector(this.context, this);
@@ -88,9 +112,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		//init for head view
 		this.mHeadView = new ListHeadView(this.context);
 		this.mHeadText = (EditText) this.mHeadView.findViewById(R.id.event_content_et);
-		//this.mHeadWidth = this.mHeadView.getMeasuredWidth();
 		this.mHeadHeight = (int) this.context.getResources().getDimension(R.dimen.item_height);
-		//this.mHeadView.invalidate();
 		this.addHeaderView(this.mHeadView);
 		this.mHeadView.setPadding(this.mHeadView.getPaddingLeft(), -1 * this.mHeadHeight, this.mHeadView.getPaddingRight(), this.mHeadView.getPaddingBottom());
 		this.headStatus = HEAD_DONE;
@@ -99,10 +121,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		View v = this.mInflater.inflate(R.layout.list_footer, null);
 		mFootText = (TextView) v.findViewById(R.id.list_foot_text);
 		this.addFooterView(v);
-		
-		this.alphaAnimation = new AlphaAnimation(1.0F, 0.5F);
-		this.alphaAnimation.setDuration(100L);
-		this.alphaAnimation.setFillAfter(true);
 		
 		this.translateAnimation = new TranslateAnimation(0, -480, 0, 0);
 		this.translateAnimation.setDuration(200L);
@@ -135,21 +153,9 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
             this.mHeadText.setText(R.string.event_pull_create);
 		}
 	}
-	
-	@SuppressLint("NewApi")
-	private void scrollItemToTop(int position){
-		//ViewGroup.LayoutParams p = this.mFootText.getLayoutParams();
-		//p.width = ((MainActivity)this.context).screenWidth;
-		//p.height = ((MainActivity)this.context).screenHeight;
-		//this.mFootText.setLayoutParams(p);
-		this.smoothScrollToPositionFromTop(position, 0);
-		Log.v(TAG, "Foot View Top: " + mFootText.getTop());
-	}
-	
 
 	private void updateHeadStatus(int y) {
 		// TODO Auto-generated method stub
-		int paddingTop = 0;
 		if(this.status != HANDLE_HEAD)  return ;
 		
 		switch(this.headStatus){
@@ -159,8 +165,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			}else if(y < 0){
 				this.headStatus = HEAD_DONE;
 			}
-			this.updateHeadText();
-			mHeadView.setPadding(0, y - this.mHeadHeight, 0, 0);
 			break;
 		case HEAD_RELEASE:
 			if( y < 0){
@@ -170,23 +174,20 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			} else if(y > 3*this.mHeadHeight){
 				return ;
 			}
-			this.updateHeadText();
-			mHeadView.setPadding(0, y - this.mHeadHeight, 0, 0);
 			break;
 		case HEAD_CREATING:
-			this.updateHeadText();
-			mHeadView.setPadding(0, 0, 0, 0);
+			y = this.mHeadHeight;
 			break;
 		case HEAD_DONE:
-			this.updateHeadText();
-			mHeadView.setPadding(0, -1 * this.mHeadHeight, 0, 0);
+			y = 0;
 			break;
 		}
+		this.updateHeadText();
+		mHeadView.setPadding(0, y - this.mHeadHeight, 0, 0);
 	}
 
 	private void updateItemStatus(int x) {
 		// TODO Auto-generated method stub
-		Log.v(TAG, "updateItemStatus");
 		switch(this.itemStatus){
 		case ITEM_NORMAL:
 			if(x > this.mHeadHeight){
@@ -196,20 +197,92 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			}
 			break;
 		case ITEM_FINISH:
-			if(x < this.mHeadHeight)
+			if(x < this.mHeadHeight){
 				this.itemStatus = ITEM_NORMAL;
+			}
 			break;
 		case ITEM_DELETE:
-			if((-1 * x) < this.mHeadHeight)
+			if((-1 * x) < this.mHeadHeight){
 				this.itemStatus = ITEM_NORMAL;
+			}
 			break;
 		}
+		float radio = (float)Math.abs(x)/this.screenWidth + 1;
 		LinearLayout v = this.currentItem.getContentLearLayout();
 		FrameLayout.LayoutParams p = (FrameLayout.LayoutParams) v.getLayoutParams();
-		p.setMargins(x, 0, 0, 0);
+		p.setMargins((int) (x/radio), 0, 0, 0);
 		v.setLayoutParams(p);
 	}
+	
+	private void startEditItem(int position) {
+		// TODO Auto-generated method stub
+		if(position == 0){		//edit head view
+			this.mHeadText.requestFocus();
+		} else {
+			scrollItemToTop(position);
+			this.currentItem.startEdit();
+		}
+		this.hideBelowItems(position);
+		InputMethodManager inputManager = 
+			(InputMethodManager)this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputManager.showSoftInput(this.mHeadText, 0);
+	}
+	
+	private void endEditItem(int index) {
+		// TODO Auto-generated method stub
+		if(index == 0){		//end edit head view
+			String content = this.mHeadText.getText().toString();
+			if(content.length() == 0){
+				//start ani
+				this.mHeadView.startAnimation(translateAnimation);
+			}
+		} else {
+			scrollToOrigin();
+			this.currentItem.startEdit();
+		}
+		this.showBelowItems(index);
+		InputMethodManager inputManager = 
+			(InputMethodManager)this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputManager.hideSoftInputFromWindow(this.mHeadText.getWindowToken(), 0);
+	}
+	
+	@SuppressLint("NewApi")
+	private void scrollItemToTop(int position){
+		ViewGroup.LayoutParams p = this.mFootText.getLayoutParams();
+		p.height = this.screenHeight;
+		this.mFootText.setLayoutParams(p);
+		this.scrollY = this.getScrollY();
+		this.smoothScrollToPositionFromTop(position, 0);
+		Log.v(TAG, "Foot View Top: " + mFootText.getTop());
+	}
+	
+	private void scrollToOrigin(){
+		ViewGroup.LayoutParams p = this.mFootText.getLayoutParams();
+		p.height = 0;
+		this.mFootText.setLayoutParams(p);
+		this.scrollTo(0, this.scrollY);
+	}
 
+	private void hideBelowItems(int index) {
+		// TODO Auto-generated method stub
+		int total = this.getAdapter().getCount();
+		for(int i = index +1 ;i < total - 1;i++){
+			ItemViewBase v = (ItemViewBase) this.getChildAt(i - this.getFirstVisiblePosition());
+			if(v != null){
+				v.halfAlpha();
+			}
+		}
+	}
+	private void showBelowItems(int index){
+		int total = this.getAdapter().getCount();
+		for(int i = index +1 ;i < total - 1;i++){
+			ItemViewBase v = (ItemViewBase) this.getChildAt(i - this.getFirstVisiblePosition());
+			if(v != null){
+				v.noneAlpha();
+			}
+		}
+	}
+	
 	@Override
 	public boolean onDown(MultiMotionEvent e) {
 		// TODO Auto-generated method stub
@@ -241,11 +314,12 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			if(position == INVALID_POSITION){
 				break;
 			}
-			EventItemView view = (EventItemView) this.getChildAt(position - this.getFirstVisiblePosition());
+			this.currentItem = (EventItemView) this.getChildAt(position - this.getFirstVisiblePosition());
 			
-			if(view instanceof OnItemFocusListener){
-				if(view.isNeedFocus((int)e.getOffsetX(), (int)e.getOffsetY() - view.getTop())){
-					scrollItemToTop(position);
+			if(this.currentItem instanceof ItemViewBase){
+				if(this.currentItem.isNeedFocus((int)e.getOffsetX(), (int)e.getOffsetY() - this.currentItem.getTop())){
+					this.startEditItem(position);
+					this.status = HANDLE_EDITING;
 				}
 			}
 			if(position < 0){
@@ -257,17 +331,66 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			if(this.headStatus == HEAD_CREATING){
 				this.headStatus = HEAD_DONE;
 				this.endEditItem(0);
-			}else if(this.headStatus != HEAD_RELEASE){
-				this.updateHeadStatus(-1);
-			}else {
+			}else if(this.headStatus == HEAD_RELEASE){
 				this.headStatus = HEAD_CREATING;
 				this.updateHeadStatus(-1);
 				this.startEditItem(0);
+			}else {
+				this.updateHeadStatus(-1);
 			}
 			break;
 		case HANDLE_ITEM:
 			if(this.itemStatus == ITEM_FINISH){
-				this.currentItem.finishEvent();
+				this.currentItem.finishItem();
+			}
+			this.updateItemStatus(0);
+			this.status = HANDLE_NOTHING;
+			break;
+		case HANDLE_LONGPRESS:
+			this.status = HANDLE_NOTHING;
+			break;
+		case HANDLE_EDITING:
+			if(this.currentItem instanceof ItemViewBase){
+				if(this.currentItem.isNeedFocus((int)e.getOffsetX(), (int)e.getOffsetY() - this.currentItem.getTop())){
+					break;
+				}
+			}
+			this.endEditItem(0);
+			this.status = HANDLE_NOTHING;
+			break;
+		}
+		return false;
+	}
+	
+	@Override
+	public boolean onFling(MultiMotionEvent e1, MultiMotionEvent e2, float velocityX,
+			float velocityY) {
+		// TODO Auto-generated method stub
+		Log.v(TAG, "onFling " + e2.getX() + " " + e2.getY());
+		TouchEvent touch = touchEvents.get(e1.getId());
+		if(touch == null){
+			return false;
+		}
+		touch.isLongPress = false;
+		this.removeEventFromList(e1.getId());
+		switch(this.status){
+		case HANDLE_NOTHING:
+			break;
+		case HANDLE_HEAD:
+			if(this.headStatus == HEAD_CREATING){
+				this.headStatus = HEAD_DONE;
+				this.endEditItem(0);
+			}else if(this.headStatus == HEAD_RELEASE){
+				this.headStatus = HEAD_CREATING;
+				this.updateHeadStatus(-1);
+				this.startEditItem(0);
+			}else {
+				this.updateHeadStatus(-1);
+			}
+			break;
+		case HANDLE_ITEM:
+			if(this.itemStatus == ITEM_FINISH){
+				this.currentItem.finishItem();
 			}
 			this.updateItemStatus(0);
 			this.status = HANDLE_NOTHING;
@@ -283,10 +406,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	public boolean onScroll(MultiMotionEvent e1, MultiMotionEvent e2, float distanceX,
 			float distanceY) {
 		// TODO Auto-generated method stub
-		Log.v(TAG, "onScroll " + e2.getX() + " " + e2.getY());
+		//Log.v(TAG, "onScroll " + e2.getX() + " " + e2.getY());
 		int dX = (int) (e2.getX() - e1.getX());
 		int dY = (int) (e2.getY() - e1.getY());
-		Log.v(TAG, "onScroll " + dX + " " + dY);
+		//Log.v(TAG, "onScroll " + dX + " " + dY);
 		if(Math.abs(dX) > 2*Math.abs(dY)){
 			//水平滚动
 			//如果竖直滑动距离大于一个item的长度
@@ -296,7 +419,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				return false;
 			}
 			if(this.itemStatus == ITEM_NORMAL)
-				this.currentItem = (EventItemView) this.getChildAt(position - this.getFirstVisiblePosition());
+				this.currentItem = (ItemViewBase) this.getChildAt(position - this.getFirstVisiblePosition());
 			this.status = HANDLE_ITEM;
 			this.updateItemStatus(dX);
 		} else if(Math.abs(dY) > 2*Math.abs(dX)){
@@ -321,91 +444,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.status = HANDLE_LONGPRESS;
 		Log.v(TAG, "onLongPress");
 	}
-	
-	@Override
-	public boolean onFling(MultiMotionEvent e1, MultiMotionEvent e2, float velocityX,
-			float velocityY) {
-		// TODO Auto-generated method stub
-		Log.v(TAG, "onFling " + e2.getX() + " " + e2.getY());
-		TouchEvent touch = touchEvents.get(e1.getId());
-		if(touch == null){
-			return false;
-		}
-		touch.isLongPress = false;
-		this.removeEventFromList(e1.getId());
-		switch(this.status){
-		case HANDLE_NOTHING:
-			break;
-		case HANDLE_HEAD:
-			if(this.headStatus == HEAD_CREATING){
-				this.headStatus = HEAD_DONE;
-				this.endEditItem(0);
-			}else if(this.headStatus != HEAD_RELEASE){
-				this.updateHeadStatus(-1);
-			}else {
-				this.headStatus = HEAD_CREATING;
-				this.updateHeadStatus(-1);
-				this.startEditItem(0);
-			}
-			break;
-		case HANDLE_ITEM:
-			if(this.itemStatus == ITEM_FINISH){
-				this.currentItem.finishEvent();
-			}
-			this.updateItemStatus(0);
-			this.status = HANDLE_NOTHING;
-		case HANDLE_LONGPRESS:
-			this.status = HANDLE_NOTHING;
-			break;
-		}
-		return false;
-	}
-	
-	private void startEditItem(int index) {
-		// TODO Auto-generated method stub
-		if(index == 0){		//edit head view
-			this.mHeadText.requestFocus();
-		}
-		this.hideBelowItems(index);
-		InputMethodManager inputManager = 
-			(InputMethodManager)this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputManager.showSoftInput(this.mHeadText, 0);
-	}
-	
-	private void endEditItem(int index) {
-		// TODO Auto-generated method stub
-		if(index == 0){		//end edit head view
-			String content = this.mHeadText.getText().toString();
-			if(content.length() == 0){
-				//start ani
-				this.mHeadView.startAnimation(translateAnimation);
-			}
-		}
-		this.showBelowItems(index);
-		InputMethodManager inputManager = 
-			(InputMethodManager)this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputManager.hideSoftInputFromWindow(this.mHeadText.getWindowToken(), 0);
-	}
-
-	private void hideBelowItems(int index) {
-		// TODO Auto-generated method stub
-		int total = this.getAdapter().getCount();
-		for(int i = index +1 ;i < total ;i++){
-			View v = this.getChildAt(i - this.getFirstVisiblePosition());
-			if(v != null){
-				v.startAnimation(this.alphaAnimation);
-			}
-		}
-	}
-	private void showBelowItems(int index){
-		int total = this.getAdapter().getCount();
-		for(int i = index +1 ;i < total ;i++){
-			View v = this.getChildAt(i - this.getFirstVisiblePosition());
-			if(v != null){
-				v.clearAnimation();
-			}
-		}
-	}
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
@@ -429,14 +467,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 //        }  
 //        child.measure(childWidthSpec, childHeightSpec);  
 //    }
-	
-	public interface OnItemFocusListener{
-		Rect focusRect = new Rect();
-		public void calcFocusRect();
-		public boolean isNeedFocus(int x, int y);
-		public void onFocus();
-		public void outFocus();
-	}
 	
 	private class TouchEvent{
         private MultiMotionEvent mCurrentDownEvent;

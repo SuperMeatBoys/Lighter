@@ -3,25 +3,38 @@ package com.gesuper.lighter.model;
 import android.content.Context;
 import android.database.Cursor;
 
-public class CaseModel {
-	public static final String ID = "id";
+public class CaseModel extends ItemModelBase{
 	public static final String EVENT_ID = "event_id";
-	public static final String CREATE_DATE = "create_date";
-	public static final String MODIFY_DATE = "modify_date";
-	public static final String CONTENT = "content";
-	public static final String SEQUENCE = "sequence";
 	
 	public static String[] mColumns = new String[]{
-		EventModel.ID, EventModel.CREATE_DATE,
-		EventModel.MODIFY_DATE, EventModel.CONTENT,
-		EventModel.SEQUENCE
+		ItemModelBase.ID, ItemModelBase.CREATE_DATE,
+		ItemModelBase.MODIFY_DATE, ItemModelBase.CONTENT,
+		ItemModelBase.SEQUENCE, ItemModelBase.STATUS,
+		CaseModel.EVENT_ID
 	};
 	
+	private static final int EVENT_ID_COLUMN = 6;
+	
+	private int eventId;
 	public CaseModel(Context context) {
+		super(context);
 		// TODO Auto-generated constructor stub
+		this.eventId = -1;
 	}
 
 	public CaseModel(Context context, Cursor cursor) {
+		super(context, cursor);
 		// TODO Auto-generated constructor stub
+		this.eventId = cursor.getInt(CaseModel.EVENT_ID_COLUMN);
+	}
+	
+	public CaseModel(Context context, String content, int event){
+		super(context, content);
+		// TODO Auto-generated constructor stub
+		this.eventId = event;
+	}
+	
+	public int getEventId(){
+		return this.eventId;
 	}
 }

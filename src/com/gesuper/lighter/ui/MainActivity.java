@@ -21,8 +21,8 @@ public class MainActivity extends Activity {
 	private EventListAdapter mEventAdapter;
 	private List<EventModel> mEventArray;
 	
-	public int screenWidth;
-	public int screenHeight;
+	public static int screenWidth;
+	public static int screenHeight;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

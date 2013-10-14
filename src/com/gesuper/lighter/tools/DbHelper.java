@@ -2,6 +2,7 @@ package com.gesuper.lighter.tools;
 
 import com.gesuper.lighter.model.CaseModel;
 import com.gesuper.lighter.model.EventModel;
+import com.gesuper.lighter.model.ItemModelBase;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -18,27 +19,30 @@ public class DbHelper extends SQLiteOpenHelper{
 	private static final int DB_VERSION = 4;
 	
 	public interface TABLE {
-		public static final String EVENTS = "event";
+		public static final String EVENTS = "events";
 		public static final String CASES = "cases";
 	}
 	
 	private static final String CREATE_EVENT_TABLE_SQL = 
 			"CREATE TABLE " + TABLE.EVENTS + " (" +
-					EventModel.ID + " INTEGER PRIMARY KEY," +
-					EventModel.CREATE_DATE + " INTEGER NOT NULL DEFAULT 0," +
-					EventModel.MODIFY_DATE + " INTEGER NOT NULL DEFAULT 0," +
-					EventModel.CONTENT + " TEXT¡¡NOT NULL DEFAULT ''," +
-					EventModel.SEQUENCE + " INTEGER NOT NULL DEFAULT 0" +
+					ItemModelBase.ID + " INTEGER PRIMARY KEY," +
+					ItemModelBase.CREATE_DATE + " INTEGER NOT NULL DEFAULT 0," +
+					ItemModelBase.MODIFY_DATE + " INTEGER NOT NULL DEFAULT 0," +
+					ItemModelBase.CONTENT + " TEXTï¿½ï¿½NOT NULL DEFAULT ''," +
+					ItemModelBase.SEQUENCE + " INTEGER NOT NULL DEFAULT 0," +
+					ItemModelBase.STATUS + " INTEGER NOT NULL DEFAULT 0," +
+					EventModel.COUNT + " INTEGER NOT NULL DEFAULT 0" +
 			")";
 	
 	private static final String CREATE_CASE_TABLE_SQL = 
 			"CREATE TABLE " + TABLE.CASES + " (" +
-					CaseModel.ID + " INTEGER PRIMARY KEY," +
-					CaseModel.EVENT_ID + " INTEGER PRIMARY KEY," +
-					CaseModel.CREATE_DATE + " INTEGER NOT NULL DEFAULT 0," +
-					CaseModel.MODIFY_DATE + " INTEGER NOT NULL DEFAULT 0," +
-					CaseModel.CONTENT + " TEXT¡¡NOT NULL DEFAULT ''," +
-					CaseModel.SEQUENCE + " INTEGER NOT NULL DEFAULT 0" +
+					ItemModelBase.ID + " INTEGER PRIMARY KEY," +
+					ItemModelBase.CREATE_DATE + " INTEGER NOT NULL DEFAULT 0," +
+					ItemModelBase.MODIFY_DATE + " INTEGER NOT NULL DEFAULT 0," +
+					ItemModelBase.CONTENT + " TEXTï¿½ï¿½NOT NULL DEFAULT ''," +
+					ItemModelBase.SEQUENCE + " INTEGER NOT NULL DEFAULT 0," +
+					ItemModelBase.STATUS + " INTEGER NOT NULL DEFAULT 0," +
+					CaseModel.EVENT_ID + " INTEGER NOT NULL DEFAULT 0" +
 			")";
 	private SQLiteDatabase db;
 	

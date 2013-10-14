@@ -1,43 +1,59 @@
 package com.gesuper.lighter.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.database.Cursor;
 
-public class EventModel {
+public class EventModel extends ItemModelBase{
 
-	public static final String ID = "id";
-	public static final String CREATE_DATE = "create_date";
-	public static final String MODIFY_DATE = "modify_date";
-	public static final String CONTENT = "content";
-	public static final String SEQUENCE = "sequence";
+	public static final String COUNT = "count";
 	
 	public static String[] mColumns = new String[]{
-		EventModel.ID, EventModel.CREATE_DATE,
-		EventModel.MODIFY_DATE, EventModel.CONTENT,
-		EventModel.SEQUENCE
+		ItemModelBase.ID, ItemModelBase.CREATE_DATE,
+		ItemModelBase.MODIFY_DATE, ItemModelBase.CONTENT,
+		ItemModelBase.SEQUENCE,ItemModelBase.STATUS,
+		EventModel.COUNT
 	};
-	private int id;
-	private long createDate;
-	private long modifyDate;
-	private String content;
-	private int sequence;
+
+	private static final int COUNT_COLUMN = 6;
+	
+	private int count;
+	private List<CaseModel> cases;
+	
 	public EventModel(Context context) {
+		super(context);
 		// TODO Auto-generated constructor stub
+		this.count  = 0;
+		this.cases = new ArrayList<CaseModel>();
 	}
 
 	public EventModel(Context context, Cursor cursor) {
+		super(context, cursor);
 		// TODO Auto-generated constructor stub
+		this.count = cursor.getInt(COUNT_COLUMN);
+		this.cases = new ArrayList<CaseModel>(this.count);
 	}
 	
 	public EventModel(Context context, String content){
-		this.id = -1;
-		this.createDate = System.currentTimeMillis();
-		this.modifyDate = System.currentTimeMillis();
-		this.content = content;
-		this.sequence = 0;
+		super(context, content);
+		// TODO Auto-generated constructor stub
+		this.count = 0;
+		this.cases = new ArrayList<CaseModel>();
 	}
 	
-	public String getContent(){
-		return this.content;
+	public List<CaseModel> getCases(){
+		return cases;
+	}
+	
+	public void addCase(CaseModel c){
+		this.cases.add(c);
+		this.count +=1;
+	}
+	
+	public void removeCase(int i){
+		this.cases.remove(i);
+		this.count -= 1;
 	}
 }
