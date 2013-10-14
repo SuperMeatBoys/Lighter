@@ -66,7 +66,11 @@ public class ItemViewBase extends FrameLayout {
 		// TODO Auto-generated method stub
 		return this.model;
 	}
-
+	
+	public String getContent(){
+		return this.mContentTv.getText().toString();
+	}
+	
 	public void startEdit() {
 		// TODO Auto-generated method stub
 		this.mContentTv.setVisibility(View.GONE);

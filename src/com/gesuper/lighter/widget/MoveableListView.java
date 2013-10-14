@@ -3,7 +3,6 @@ package com.gesuper.lighter.widget;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.gesuper.lightclock.view.AlertItemView;
 import com.gesuper.lighter.R;
 import com.gesuper.lighter.widget.MultiGestureDetector.MultiMotionEvent;
 import com.gesuper.lighter.widget.MultiGestureDetector.OnMultiGestureListener;
@@ -11,11 +10,14 @@ import com.gesuper.lighter.widget.MultiGestureDetector.OnMultiGestureListener;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.PixelFormat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -81,6 +83,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	private int mDragPointY;
 	private int mUpperBound;
 	private int mLowerBound;
+
+	private int mTouchSlop;
 	
 	public MoveableListView(Context context) {
 		super(context);
@@ -136,6 +140,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			public void onAnimationRepeat(Animation arg0) {}
 			public void onAnimationStart(Animation arg0) {}
 		});
+		
+		this.mTouchSlop = ViewConfiguration.get(this.getContext()).getScaledTouchSlop();
 	}
 	
 	private void updateHeadText(){
@@ -348,6 +354,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			break;
 		case HANDLE_LONGPRESS:
 			this.status = HANDLE_NOTHING;
+			stopDrag();
 			break;
 		case HANDLE_EDITING:
 			if(this.currentItem instanceof ItemViewBase){
@@ -397,6 +404,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			break;
 		case HANDLE_LONGPRESS:
 			this.status = HANDLE_NOTHING;
+			stopDrag();
 			break;
 		}
 		return false;
@@ -410,27 +418,65 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		int dX = (int) (e2.getX() - e1.getX());
 		int dY = (int) (e2.getY() - e1.getY());
 		//Log.v(TAG, "onScroll " + dX + " " + dY);
-		if(Math.abs(dX) > 2*Math.abs(dY)){
-			//水平滚动
-			//如果竖直滑动距离大于一个item的长度
-			if(Math.abs(distanceY) > this.mHeadHeight) return false;
-			int position = this.pointToPosition((int)e2.getOffsetX(), (int)e2.getOffsetY());
-			if(position == INVALID_POSITION){
-				return false;
-			}
-			if(this.itemStatus == ITEM_NORMAL)
-				this.currentItem = (ItemViewBase) this.getChildAt(position - this.getFirstVisiblePosition());
-			this.status = HANDLE_ITEM;
-			this.updateItemStatus(dX);
-		} else if(Math.abs(dY) > 2*Math.abs(dX)){
-			//竖直滚动
-			if(this.getFirstVisiblePosition() == 0 && this.status != HANDLE_ITEM){
-				this.status = HANDLE_HEAD;
-				this.headStatus = HEAD_PULL;
-				this.updateHeadStatus(dY);
+		switch(this.status){
+		case HANDLE_NOTHING:{
+			if(Math.abs(dX) > 2*Math.abs(dY)){
+				//水平滚动
+				//如果竖直滑动距离大于一个item的长度
+				if(Math.abs(distanceY) > this.mHeadHeight) return false;
+				int position = this.pointToPosition((int)e2.getOffsetX(), (int)e2.getOffsetY());
+				if(position == INVALID_POSITION){
+					return false;
+				}
+				if(this.itemStatus == ITEM_NORMAL)
+					this.currentItem = (ItemViewBase) this.getChildAt(position - this.getFirstVisiblePosition());
+				this.status = HANDLE_ITEM;
+				this.updateItemStatus(dX);
+			} else if(Math.abs(dY) > 2*Math.abs(dX)){
+				//竖直滚动
+				if(this.getFirstVisiblePosition() == 0 && this.status != HANDLE_ITEM){
+					this.status = HANDLE_HEAD;
+					this.headStatus = HEAD_PULL;
+					this.updateHeadStatus(dY);
+				}
 			}
 		}
+		case HANDLE_LONGPRESS:{
+			dragView((int) e2.getOffsetY());
+ 			//adjustScrollBounds(this.mCurrentY);
+			break;
+		}
+		}
 		return false;
+	}
+
+	private void dragView(int y) {
+		// TODO Auto-generated method stub
+		if(mDragView != null){
+	        mWindowParams.y = y - mDragPointY + mDragOffSetY;
+	        mWindowManager.updateViewLayout(mDragView, mWindowParams);
+		}
+		int tempPosition = this.pointToPosition(20, y);
+		if(tempPosition == INVALID_POSITION){
+			return ;
+		}
+//		if(mDragCurrentPostion != tempPosition){
+//			this.exchangeAdapterItem(mDragCurrentPostion, tempPosition);
+//			mDragCurrentPostion = tempPosition;
+//		}
+		
+		//滚动
+//		int scrollY = 0;
+//		if(this.mCurrentY < mUpperBound){
+//			scrollY = 8;
+//		}else if(this.mCurrentY > mLowerBound){
+//			scrollY = -8;
+//		}
+//		
+//		if(scrollY != 0){
+//			int top = this.getChildAt(mDragCurrentPostion - this.getFirstVisiblePosition()).getTop();
+//			this.setSelectionFromTop(mDragCurrentPostion, top + scrollY);
+//		}
 	}
 
 	@Override
@@ -441,8 +487,76 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			return ;
 		}
 		touch.isLongPress = false;
+		if(this.status != HANDLE_NOTHING){
+			return ;
+		}
 		this.status = HANDLE_LONGPRESS;
 		Log.v(TAG, "onLongPress");
+		//prepare for drag currentItem
+		int position = this.pointToPosition((int)e.getOffsetX(), (int)e.getOffsetY());
+		if(position == INVALID_POSITION){
+			return ;
+		}
+		this.mDragItemView = (EventItemView) this.getChildAt(position - this.getFirstVisiblePosition());
+		
+ 		this.mDragPointX = 9;
+ 		this.mDragPointY = (int) (e.getOffsetY() - mDragItemView.getTop());
+ 		this.mDragOffSetY = (int) (e.getY() - e.getOffsetY());
+			
+ 		int height = getHeight();
+ 		mUpperBound = (int) Math.min(e.getOffsetY() - mTouchSlop, height / 3);
+ 		mLowerBound = (int) Math.max(e.getOffsetY() + mTouchSlop, height * 2 / 3);
+ 		mDragCurrentPostion = position;
+		
+		Log.d(TAG, "drag item:" + this.mDragItemView.getContent());
+		this.mDragItemView.setDrawingCacheEnabled(true);
+		Bitmap bitmap = Bitmap.createBitmap(this.mDragItemView.getDrawingCache(true));
+		this.mDragItemView.setDrawingCacheEnabled(false);
+		startDrag(bitmap, this.mDragPointY + this.mDragItemView.getTop());
+	}
+
+	private void startDrag(Bitmap bitmap, int y) {
+		// TODO Auto-generated method stub
+		this.stopDrag();
+		this.mWindowParams = new WindowManager.LayoutParams();
+		this.mWindowParams.gravity = Gravity.TOP | Gravity.LEFT;
+		
+		this.mWindowParams.alpha = (float) 0.5;
+		this.mWindowParams.x = mDragPointX;
+		this.mWindowParams.y = y - mDragPointY + mDragOffSetY;
+
+		this.mWindowParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+		this.mWindowParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
+		this.mWindowParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+		this.mWindowParams.format = PixelFormat.TRANSLUCENT;
+		this.mWindowParams.windowAnimations = 0;
+        
+        Context context = this.getContext();
+        ImageView v = new ImageView(context);
+        
+        v.setImageBitmap(bitmap);
+        mDragBitmap = bitmap;
+
+        mWindowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        mWindowManager.addView(v, mWindowParams);
+        mDragView = v;
+	}
+
+	private void stopDrag() {
+		// TODO Auto-generated method stub
+		if (mDragView != null) {
+            mWindowManager.removeView(mDragView);
+            mDragView.setImageDrawable(null);
+            mDragView = null;
+        }
+        if (mDragBitmap != null) {
+            mDragBitmap.recycle();
+            mDragBitmap = null;
+        }
 	}
 
 	@Override

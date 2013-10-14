@@ -262,7 +262,7 @@ public class MultiGestureDetector {
                     break;  
                 }  
                 // 触发手势监听器的onLongPress事件  
-                mHandler.removeMessages(TAP_SINGLE, idx);// 移除单击事件确认  
+                //mHandler.removeMessages(TAP_SINGLE, idx);// 移除单击事件确认  
                 info.mInLongPress = true;  
                 mListener.onLongPress(info.mCurrentDownEvent);  
                 break;  
@@ -399,10 +399,11 @@ public class MultiGestureDetector {
                 break;  
             }  
             info.mStillDown = false;  
-            if (info.mInLongPress) {// 处于长按状态  
-                mHandler.removeMessages(TAP_SINGLE, idx);// 可以无视这行代码  
-                info.mInLongPress = false;  
-            } else if (info.mAlwaysInTapRegion) {// 尚未移动过    
+            //if (info.mInLongPress) {// 处于长按状态  
+            //    mHandler.removeMessages(TAP_SINGLE, idx);// 可以无视这行代码  
+            //    info.mInLongPress = false;  
+            //} else if (info.mAlwaysInTapRegion) {// 尚未移动过    
+            if (info.mAlwaysInTapRegion) {// 尚未移动过    
                 handled = mListener.onSingleTapUp(currentUpEvent);// 触发onSingleTapUp事件  
             } else {  
                 // A fling must travel the minimum tap distance  
