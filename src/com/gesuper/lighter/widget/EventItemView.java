@@ -28,6 +28,5 @@ public class EventItemView extends ItemViewBase{
 	
 	public void setModel(EventModel mItemModel) {
 		super.setModel(mItemModel);
-		
 	}
 }

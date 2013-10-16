@@ -6,6 +6,7 @@ import java.util.List;
 import com.gesuper.lighter.R;
 import com.gesuper.lighter.model.EventModel;
 import com.gesuper.lighter.tools.EventListAdapter;
+import com.gesuper.lighter.widget.HeadViewBase;
 import com.gesuper.lighter.widget.MoveableListView;
 
 import android.os.Bundle;
@@ -55,6 +56,11 @@ public class MainActivity extends Activity {
 		//Inflate the menu; this adds items to the action bar if it is present.
 		//getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+	
+	@Override
+	protected void onStop(){
+		super.onStop();
 	}
 
 }

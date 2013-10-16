@@ -52,13 +52,13 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	private int screenWidth;
 	private int screenHeight;
 	private LayoutInflater mInflater;
-	private Context context;
+	protected Context context;
 	private MultiGestureDetector mGesture;
 	private List<TouchEvent> touchEvents;
 	private int status;
 	
 	//field for create new 
-	private LinearLayout mHeadView;
+	private HeadViewBase mHeadView;
 	private EditText mHeadText;
 	//private int mHeadWidth;
 	private int mHeadHeight;
@@ -114,11 +114,14 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
         this.status = HANDLE_NOTHING;
         
 		//init for head view
-		this.mHeadView = new ListHeadView(this.context);
+		this.mHeadView = new HeadViewBase(this.context);
+        //this.mHeadView = (LinearLayout) mInflater.inflate(R.layout.event_head, null);
 		this.mHeadText = (EditText) this.mHeadView.findViewById(R.id.event_content_et);
 		this.mHeadHeight = (int) this.context.getResources().getDimension(R.dimen.item_height);
+		this.mHeadView.invalidate();
 		this.addHeaderView(this.mHeadView);
-		this.mHeadView.setPadding(this.mHeadView.getPaddingLeft(), -1 * this.mHeadHeight, this.mHeadView.getPaddingRight(), this.mHeadView.getPaddingBottom());
+		Log.v(TAG, "head view count: " + this.getHeaderViewsCount());
+		//this.mHeadView.setPadding(this.mHeadView.getPaddingLeft(), -1 * this.mHeadHeight, this.mHeadView.getPaddingRight(), this.mHeadView.getPaddingBottom());
 		this.headStatus = HEAD_DONE;
 		this.itemStatus = ITEM_NORMAL;
 		
@@ -126,7 +129,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		mFootText = (TextView) v.findViewById(R.id.list_foot_text);
 		this.addFooterView(v);
 		
-		this.translateAnimation = new TranslateAnimation(0, -480, 0, 0);
+		this.translateAnimation = new TranslateAnimation(0, -screenWidth, 0, 0);
 		this.translateAnimation.setDuration(200L);
 		this.translateAnimation.setFillEnabled(true);
 		this.translateAnimation.setFillBefore(true);
@@ -147,7 +150,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	private void updateHeadText(){
 		switch(this.headStatus){
 		case HEAD_PULL:
-			this.mHeadText.setText(R.string.event_pull_create);
+			//this.mHeadText.setText(R.string.event_pull_create);
 			break;
 		case HEAD_RELEASE:
 			this.mHeadText.setText(R.string.event_release_create);
@@ -259,14 +262,14 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.mFootText.setLayoutParams(p);
 		this.scrollY = this.getScrollY();
 		this.smoothScrollToPositionFromTop(position, 0);
-		Log.v(TAG, "Foot View Top: " + mFootText.getTop());
+		Log.v(TAG, "this.scrollY: " + this.scrollY);
 	}
 	
 	private void scrollToOrigin(){
+		this.scrollTo(0, this.scrollY);
 		ViewGroup.LayoutParams p = this.mFootText.getLayoutParams();
 		p.height = 0;
 		this.mFootText.setLayoutParams(p);
-		this.scrollTo(0, this.scrollY);
 	}
 
 	private void hideBelowItems(int index) {
@@ -318,6 +321,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		case HANDLE_NOTHING:
 			int position = this.pointToPosition((int)e.getOffsetX(), (int)e.getOffsetY());
 			if(position == INVALID_POSITION){
+				//create new item on bottom
 				break;
 			}
 			this.currentItem = (EventItemView) this.getChildAt(position - this.getFirstVisiblePosition());
@@ -327,10 +331,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 					this.startEditItem(position);
 					this.status = HANDLE_EDITING;
 				}
-			}
-			if(position < 0){
-				//create new item at bottom
-				
 			}
 			break;
 		case HANDLE_HEAD:
@@ -362,7 +362,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 					break;
 				}
 			}
-			this.endEditItem(0);
+			this.endEditItem(1);
 			this.status = HANDLE_NOTHING;
 			break;
 		}
@@ -486,7 +486,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		if(touch == null){
 			return ;
 		}
-		touch.isLongPress = false;
+		touch.isLongPress = true;
 		if(this.status != HANDLE_NOTHING){
 			return ;
 		}

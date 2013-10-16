@@ -2,12 +2,9 @@ package com.gesuper.lighter.widget;
 
 import com.gesuper.lighter.R;
 import com.gesuper.lighter.model.EventModel;
-import com.gesuper.lighter.ui.MainActivity;
-
 import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
@@ -43,7 +40,7 @@ public class ItemViewBase extends FrameLayout {
 		this.mContentEt = (EditText)findViewById(R.id.event_content_et);
 		this.mContentTv = (TextView)findViewById(R.id.event_content_tv);
 		ViewGroup.LayoutParams p = this.mContentLinear.getLayoutParams();
-		p.width = ((MainActivity)this.context).screenWidth;
+		p.width = 480;
 		this.mContentLinear.setLayoutParams(p);
 		
 		this.focusRect = new Rect();
