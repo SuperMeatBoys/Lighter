@@ -63,6 +63,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	
 	//field for create new 
 	private LinearLayout mHeadView;
+	private LinearLayout mHeadLinear;
 	private EditText mHeadText;
 	//private int mHeadWidth;
 	private int mHeadHeight;
@@ -122,6 +123,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		//this.mHeadView = new HeadViewBase(this.context);
 		this.mHeadView = (LinearLayout) mInflater.inflate(R.layout.event_head, null);
 		this.measureView(mHeadView);
+		this.mHeadLinear = (LinearLayout) this.mHeadView.findViewById(R.id.head_linear);
 		this.mHeadText = (EditText) this.mHeadView.findViewById(R.id.event_content_et);
 		this.mHeadBitmap = (ImageView) this.mHeadView.findViewById(R.id.head_bitmap);
 		this.mHeadHeight = (int) this.context.getResources().getDimension(R.dimen.item_height);
@@ -130,6 +132,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.mHeadView.setPadding(this.mHeadView.getPaddingLeft(), -1 * this.mHeadHeight, this.mHeadView.getPaddingRight(), this.mHeadView.getPaddingBottom());
 
 		this.mHeadBitmap.setImageBitmap(this.mHeadViewBitmap);
+		this.mHeadLinear.setVisibility(View.GONE);
+		this.mHeadBitmap.setVisibility(View.VISIBLE);
 		this.headStatus = HEAD_DONE;
 		this.itemStatus = ITEM_NORMAL;
 		View v = this.mInflater.inflate(R.layout.list_footer, null);
@@ -178,6 +182,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		case HEAD_PULL:
 			if(y > this.mHeadHeight){
 				this.headStatus = HEAD_RELEASE;
+				this.mHeadBitmap.setVisibility(View.GONE);
+				this.mHeadLinear.setVisibility(View.VISIBLE);
 			}else if(y < 0){
 				this.headStatus = HEAD_DONE;
 			}
@@ -187,6 +193,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.headStatus = HEAD_DONE;
 			} else if(y < this.mHeadHeight){
 				this.headStatus = HEAD_PULL;
+				this.mHeadLinear.setVisibility(View.GONE);
 				this.mHeadBitmap.setVisibility(View.VISIBLE);
 			} else if(y > 3*this.mHeadHeight){
 				return ;
@@ -197,6 +204,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			break;
 		case HEAD_DONE:
 			y = 0;
+			this.mHeadLinear.setVisibility(View.GONE);
+			this.mHeadBitmap.setVisibility(View.VISIBLE);
 			break;
 		}
 		
@@ -204,7 +213,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			this.roateHeadViewX(y);
 		}
 		this.updateHeadText();
-		Log.d(TAG, "y " + y);
 		this.mHeadView.setPadding(0, y - this.mHeadHeight, 0, 0);
 	}
 
