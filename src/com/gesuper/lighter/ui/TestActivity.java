@@ -30,7 +30,7 @@ public class TestActivity extends Activity {
 	private int rotateZ;
 	private Camera camera;
 	private float translateZ;
-	private LinearLayout item;
+	private HeadViewBase item;
     public void onCreate(Bundle savedInstanceState) {  
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test);

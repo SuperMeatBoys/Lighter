@@ -16,9 +16,10 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-public class HeadViewBase extends LinearLayout {
+public class HeadViewBase extends FrameLayout {
 	public final static String TAG = "HeadViewBase";
 	private Context context;
 	private Matrix mMatrix;

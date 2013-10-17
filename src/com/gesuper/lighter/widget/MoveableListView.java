@@ -10,6 +10,9 @@ import com.gesuper.lighter.widget.MultiGestureDetector.OnMultiGestureListener;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Camera;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -27,6 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.view.inputmethod.InputMethodManager;
+import android.view.View.MeasureSpec;
 import android.view.View.OnTouchListener;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -58,11 +62,13 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	private int status;
 	
 	//field for create new 
-	private HeadViewBase mHeadView;
+	private LinearLayout mHeadView;
 	private EditText mHeadText;
 	//private int mHeadWidth;
 	private int mHeadHeight;
 	private int headStatus;
+	private ImageView mHeadBitmap;
+	private Bitmap mHeadViewBitmap;
 	private TranslateAnimation translateAnimation;
 	
 	// field for item 
@@ -85,7 +91,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	private int mLowerBound;
 
 	private int mTouchSlop;
-	
 	public MoveableListView(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
@@ -114,17 +119,19 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
         this.status = HANDLE_NOTHING;
         
 		//init for head view
-		this.mHeadView = new HeadViewBase(this.context);
-        //this.mHeadView = (LinearLayout) mInflater.inflate(R.layout.event_head, null);
+		//this.mHeadView = new HeadViewBase(this.context);
+		this.mHeadView = (LinearLayout) mInflater.inflate(R.layout.event_head, null);
+		this.measureView(mHeadView);
 		this.mHeadText = (EditText) this.mHeadView.findViewById(R.id.event_content_et);
+		this.mHeadBitmap = (ImageView) this.mHeadView.findViewById(R.id.head_bitmap);
 		this.mHeadHeight = (int) this.context.getResources().getDimension(R.dimen.item_height);
-		this.mHeadView.invalidate();
+		this.mHeadViewBitmap = this.getHeadViewBitmap();
 		this.addHeaderView(this.mHeadView);
-		Log.v(TAG, "head view count: " + this.getHeaderViewsCount());
-		//this.mHeadView.setPadding(this.mHeadView.getPaddingLeft(), -1 * this.mHeadHeight, this.mHeadView.getPaddingRight(), this.mHeadView.getPaddingBottom());
+		this.mHeadView.setPadding(this.mHeadView.getPaddingLeft(), -1 * this.mHeadHeight, this.mHeadView.getPaddingRight(), this.mHeadView.getPaddingBottom());
+
+		this.mHeadBitmap.setImageBitmap(this.mHeadViewBitmap);
 		this.headStatus = HEAD_DONE;
 		this.itemStatus = ITEM_NORMAL;
-		
 		View v = this.mInflater.inflate(R.layout.list_footer, null);
 		mFootText = (TextView) v.findViewById(R.id.list_foot_text);
 		this.addFooterView(v);
@@ -166,7 +173,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	private void updateHeadStatus(int y) {
 		// TODO Auto-generated method stub
 		if(this.status != HANDLE_HEAD)  return ;
-		
+
 		switch(this.headStatus){
 		case HEAD_PULL:
 			if(y > this.mHeadHeight){
@@ -180,6 +187,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.headStatus = HEAD_DONE;
 			} else if(y < this.mHeadHeight){
 				this.headStatus = HEAD_PULL;
+				this.mHeadBitmap.setVisibility(View.VISIBLE);
 			} else if(y > 3*this.mHeadHeight){
 				return ;
 			}
@@ -191,8 +199,13 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			y = 0;
 			break;
 		}
+		
+		if(this.headStatus == HEAD_PULL){
+			this.roateHeadViewX(y);
+		}
 		this.updateHeadText();
-		mHeadView.setPadding(0, y - this.mHeadHeight, 0, 0);
+		Log.d(TAG, "y " + y);
+		this.mHeadView.setPadding(0, y - this.mHeadHeight, 0, 0);
 	}
 
 	private void updateItemStatus(int x) {
@@ -343,6 +356,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.startEditItem(0);
 			}else {
 				this.updateHeadStatus(-1);
+				this.status = HANDLE_NOTHING;
 			}
 			break;
 		case HANDLE_ITEM:
@@ -393,6 +407,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.startEditItem(0);
 			}else {
 				this.updateHeadStatus(-1);
+				this.status = HANDLE_NOTHING;
 			}
 			break;
 		case HANDLE_ITEM:
@@ -434,6 +449,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.updateItemStatus(dX);
 			} else if(Math.abs(dY) > 2*Math.abs(dX)){
 				//竖直滚动
+				Log.v(TAG, "FirstVisiblePosition" + this.getFirstVisiblePosition());
 				if(this.getFirstVisiblePosition() == 0 && this.status != HANDLE_ITEM){
 					this.status = HANDLE_HEAD;
 					this.headStatus = HEAD_PULL;
@@ -444,6 +460,14 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		case HANDLE_LONGPRESS:{
 			dragView((int) e2.getOffsetY());
  			//adjustScrollBounds(this.mCurrentY);
+			break;
+		}
+		case HANDLE_HEAD:{
+			this.updateHeadStatus(dY);
+			break;
+		}
+		case HANDLE_ITEM:{
+			this.updateItemStatus(dX);
 			break;
 		}
 		}
@@ -622,6 +646,71 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
         } else {  
             // Log.e(MYTAG, CLASS_NAME + ".addEventIntoList, invalidata id !");  
         }  
-    } 
+    }
+    
+    private void roateHeadViewX(float height){
+    	float angle = (float) (Math.acos(height / this.mHeadViewBitmap.getHeight())*(180/Math.PI));
+    	Camera camera = new Camera();
+        camera.save();
+        Matrix matrix = new Matrix();
+        // rotate
+        camera.rotateX(angle);
+        camera.rotateY(0);
+        camera.rotateZ(0);
+        // translate
+        camera.translate(0, 0, 0);
+        camera.getMatrix(matrix);
+        // 恢复到之前的初始状态。
+        camera.restore();
+        // 设置图像处理的中心点
+        int w = this.mHeadViewBitmap.getWidth()/2;
+        int h = this.mHeadViewBitmap.getHeight()/2;
+        matrix.preTranslate(-w, -h);
+        matrix.postTranslate(w, h); 
+        Bitmap newBit = null;
+        try {
+            // 经过矩阵转换后的图像宽高有可能不大于0，此时会抛出IllegalArgumentException
+            newBit = Bitmap.createBitmap(this.mHeadViewBitmap, 0, 0, this.mHeadViewBitmap.getWidth(), this.mHeadViewBitmap.getHeight(), matrix, false);
+        } catch (IllegalArgumentException iae) {
+            iae.printStackTrace();
+        }
+        if (newBit != null) {
+            Log.v(TAG, "width=" + newBit.getWidth() + " height=" + newBit.getHeight());
+            this.mHeadBitmap.setImageBitmap(newBit);
+        }
+    }
+    
+    private Bitmap getHeadViewBitmap() {
+		// TODO Auto-generated method stub
+    	//EventItemView mHeadView = new EventItemView(this.context);
+    	//this.measureView(mHeadView);
+		mHeadView.measure(
+				MeasureSpec.makeMeasureSpec(mHeadView.getMeasuredWidth(), MeasureSpec.EXACTLY),
+		        MeasureSpec.makeMeasureSpec(mHeadView.getMeasuredHeight(), MeasureSpec.EXACTLY));
+		mHeadView.layout(0, 0, mHeadView.getMeasuredWidth(),mHeadView.getMeasuredHeight());
+		Bitmap b = Bitmap.createBitmap(mHeadView.getMeasuredWidth(), mHeadView.getMeasuredHeight(), Bitmap.Config.RGB_565);
+		Canvas c = new Canvas(b);
+		mHeadView.draw(c);
+		return b;
+	}
+    
+    private void measureView(View child) {  
+		WindowManager wm = (WindowManager) this.context.getSystemService(Context.WINDOW_SERVICE);
+	    int screenWidth = wm.getDefaultDisplay().getWidth();
+	    ViewGroup.LayoutParams p = child.getLayoutParams();  
+		if (p == null) {  
+		    p = new ViewGroup.LayoutParams(screenWidth,  
+		    		ViewGroup.LayoutParams.WRAP_CONTENT);  
+		}  
+		int childWidthSpec = ViewGroup.getChildMeasureSpec(0, 0 + 0, p.width);  
+		int lpHeight = p.height;  
+		int childHeightSpec;  
+		if (lpHeight > 0) {  
+		    childHeightSpec = MeasureSpec.makeMeasureSpec(lpHeight, MeasureSpec.EXACTLY);  
+		} else {  
+		    childHeightSpec = MeasureSpec.makeMeasureSpec(0,  MeasureSpec.UNSPECIFIED);  
+		}  
+		child.measure(childWidthSpec, childHeightSpec);  
+	}
 }
 
