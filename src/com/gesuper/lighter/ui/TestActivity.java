@@ -1,6 +1,7 @@
 package com.gesuper.lighter.ui;
 
 import com.gesuper.lighter.R;
+import com.gesuper.lighter.tools.RotateAnimation;
 import com.gesuper.lighter.widget.HeadViewBase;
 
 import android.app.Activity;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -53,7 +55,8 @@ public class TestActivity extends Activity {
 				if(edit.getText().toString().length() != 0){
 					height = Float.valueOf(edit.getText().toString());
 				}
-				roateImage(height);
+				//roateImage(height);
+				applyRotation(0, 180);
 			}
 			
 		});
@@ -113,7 +116,19 @@ public class TestActivity extends Activity {
             img.setImageBitmap(newBit);
         }
     }
-	
+	private void applyRotation(float start, float end) { 
+		// 计算中心点 
+		final float centerX = img.getWidth() / 2.0f; 
+		final float centerY = img.getHeight() / 2.0f; 
+		final RotateAnimation rotation = new RotateAnimation(start, end, 
+		centerX, centerY, 310.0f, true); 
+		rotation.setDuration(500); 
+		rotation.setFillAfter(true); 
+		rotation.setInterpolator(new AccelerateInterpolator()); 
+		// 设置监听  
+		img.startAnimation(rotation); 
+	}
+	 
 	private Bitmap getBitmap() {
 		// TODO Auto-generated method stub
 		this.measureView(item);
