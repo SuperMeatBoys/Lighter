@@ -27,10 +27,10 @@ public class HeadViewBase extends FrameLayout {
 	 private Bitmap mBitmap;
 	private Canvas canvas;
     
-	public HeadViewBase(Context context) {
+	public HeadViewBase(Context context, int layoutId) {
 		super(context);
 		// TODO Auto-generated constructor stub
-		inflate(context, R.layout.event_head, this);
+		inflate(context, layoutId, this);
 		this.context = context;
 	}
 	

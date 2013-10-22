@@ -5,10 +5,12 @@
     android:background="#000000"
     tools:context=".Main" >
     
-    <ListView
+    <com.gesuper.lighter.widget.MoveableListView
         android:id="@+id/case_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
+        android:layout_height="match_parent"
+        android:divider="@null" >
+
+    </com.gesuper.lighter.widget.MoveableListView>
     
 </RelativeLayout>

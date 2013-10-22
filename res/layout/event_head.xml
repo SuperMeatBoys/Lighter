@@ -8,12 +8,12 @@
 	    android:layout_width="match_parent"
 		android:layout_height="@dimen/item_height"
 		android:orientation="vertical"
-		android:id="@+id/head_linear">"
+		android:id="@+id/event_head_linear">
 	    <LinearLayout
 			android:id="@+id/event_linear"
 	        android:layout_width="match_parent"
 	        android:layout_height="@dimen/item_height"
-	        android:background="@drawable/item_bg"
+	        android:background="@drawable/event_bg"
 	        android:orientation="horizontal" >
 			<FrameLayout 
 			    android:layout_width="0dp"

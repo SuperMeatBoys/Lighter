@@ -2,16 +2,7 @@ package com.gesuper.lighter.widget;
 
 import com.gesuper.lighter.R;
 import com.gesuper.lighter.model.EventModel;
-import com.gesuper.lighter.ui.MainActivity;
 import android.content.Context;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class EventItemView extends ItemViewBase{

@@ -3,7 +3,7 @@ import android.graphics.Camera;
 import android.graphics.Matrix; 
 import android.view.animation.Animation; 
 import android.view.animation.Transformation; 
-public class RotateAnimation extends Animation { 
+public class Rotate3DAnimation extends Animation { 
 	// 开始角度 
 	private final float mFromDegrees; 
 	// 结束角度 
@@ -17,7 +17,7 @@ public class RotateAnimation extends Animation {
 	// 摄像头 
 	private Camera mCamera; 
 	
-	public RotateAnimation(float fromDegrees, float toDegrees, float centerX, 
+	public Rotate3DAnimation(float fromDegrees, float toDegrees, float centerX, 
 			float centerY, float depthZ, boolean reverse) { 
 		mFromDegrees = fromDegrees; 
 		mToDegrees = toDegrees; 
@@ -44,17 +44,13 @@ public class RotateAnimation extends Animation {
 		final float centerY = mCenterY; 
 		final Camera camera = mCamera; 
 		final Matrix matrix = t.getMatrix(); 
-		camera.save(); 
-		if (mReverse) { 
-			camera.translate(0.0f, 0.0f, mDepthZ * interpolatedTime); 
-		} else { 
-			camera.translate(0.0f, 0.0f, mDepthZ * (1.0f - interpolatedTime)); 
-		} 
-		camera.rotateY(degrees); 
+		camera.save();
+		camera.rotateX(degrees); 
 		// 取得变换后的矩阵 
 		camera.getMatrix(matrix); 
 		camera.restore(); 
-		matrix.preTranslate(-centerX, -centerY); 
-		matrix.postTranslate(centerX, centerY); 
+		matrix.preTranslate(-centerX, 0); 
+		matrix.postTranslate(centerX, 0); 
+		
 	} 
 } 

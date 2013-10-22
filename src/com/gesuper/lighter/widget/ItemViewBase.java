@@ -2,12 +2,16 @@ package com.gesuper.lighter.widget;
 
 import com.gesuper.lighter.R;
 import com.gesuper.lighter.model.EventModel;
+import com.gesuper.lighter.model.ItemModelBase;
+
 import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -18,7 +22,7 @@ public class ItemViewBase extends FrameLayout {
 	private static final int NORMAL = 0;
 	private static final int FINISHED = 1;
 	protected Context context;
-	protected EventModel model;
+	protected ItemModelBase model;
 	protected EditText mContentEt;
 	protected TextView mContentTv;
 	protected LinearLayout mContentLinear;
@@ -36,9 +40,9 @@ public class ItemViewBase extends FrameLayout {
 
 	private void initResource() {
 		// TODO Auto-generated method stub
-		this.mContentLinear = (LinearLayout)findViewById(R.id.event_linear);
-		this.mContentEt = (EditText)findViewById(R.id.event_content_et);
-		this.mContentTv = (TextView)findViewById(R.id.event_content_tv);
+		this.mContentLinear = (LinearLayout)findViewById(R.id.item_linear);
+		this.mContentEt = (EditText)findViewById(R.id.item_content_et);
+		this.mContentTv = (TextView)findViewById(R.id.item_content_tv);
 		ViewGroup.LayoutParams p = this.mContentLinear.getLayoutParams();
 		p.width = 480;
 		this.mContentLinear.setLayoutParams(p);
@@ -50,7 +54,7 @@ public class ItemViewBase extends FrameLayout {
 		this.status = NORMAL;
 	}
 
-	public void setModel(EventModel mItemModel) {
+	public void setModel(ItemModelBase mItemModel) {
 		// TODO Auto-generated method stub
 		this.model = mItemModel;
 		this.mContentEt.setText(mItemModel.getContent());
@@ -59,7 +63,7 @@ public class ItemViewBase extends FrameLayout {
 		this.calcFocusRect();
 	}
 
-	public EventModel getModel() {
+	public ItemModelBase getModel() {
 		// TODO Auto-generated method stub
 		return this.model;
 	}
@@ -70,10 +74,15 @@ public class ItemViewBase extends FrameLayout {
 	
 	public void startEdit() {
 		// TODO Auto-generated method stub
+		Log.v(TAG, "startEdit");
 		this.mContentTv.setVisibility(View.GONE);
 		this.mContentEt.setVisibility(View.VISIBLE);
 		this.mContentEt.setSelection(this.mContentEt.getEditableText().length());
 		this.mContentEt.requestFocus();
+
+		InputMethodManager inputManager = 
+			(InputMethodManager)this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputManager.showSoftInput(this.mContentEt, 0);
 	}
 	
 	public void endEdit(){
@@ -98,21 +107,6 @@ public class ItemViewBase extends FrameLayout {
 		return false;
 	}
 	
-	public void onFocus() {
-		// TODO Auto-generated method stub
-		this.mContentTv.setVisibility(View.GONE);
-		this.mContentEt.setVisibility(View.VISIBLE);
-	}
-
-	public void outFocus() {
-		// TODO Auto-generated method stub
-		this.mContentTv.setText(this.mContentEt.getText());
-		this.mContentEt.setVisibility(View.GONE);
-		this.mContentTv.setVisibility(View.VISIBLE);
-		
-		this.calcFocusRect();
-	}
-	
 	public LinearLayout getContentLearLayout(){
 		// TODO Auto-generated method stub
 		return this.mContentLinear;
@@ -126,7 +120,7 @@ public class ItemViewBase extends FrameLayout {
 			this.status = FINISHED;
 		} else {
 			this.mContentTv.getPaint().setFlags(Paint.LINEAR_TEXT_FLAG);
-			this.mContentLinear.setBackgroundResource(R.drawable.item_bg);
+			this.mContentLinear.setBackgroundResource(R.drawable.event_bg);
 			this.status = NORMAL;
 		}
 	}

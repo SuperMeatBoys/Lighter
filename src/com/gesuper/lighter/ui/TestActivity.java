@@ -1,7 +1,7 @@
 package com.gesuper.lighter.ui;
 
 import com.gesuper.lighter.R;
-import com.gesuper.lighter.tools.RotateAnimation;
+import com.gesuper.lighter.tools.Rotate3DAnimation;
 import com.gesuper.lighter.widget.HeadViewBase;
 
 import android.app.Activity;
@@ -37,7 +37,7 @@ public class TestActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test);
         
-        item = new HeadViewBase(this);
+        item = new HeadViewBase(this, R.layout.event_head);
         this.init();
     }
 	private void init() {
@@ -120,7 +120,7 @@ public class TestActivity extends Activity {
 		// 计算中心点 
 		final float centerX = img.getWidth() / 2.0f; 
 		final float centerY = img.getHeight() / 2.0f; 
-		final RotateAnimation rotation = new RotateAnimation(start, end, 
+		final Rotate3DAnimation rotation = new Rotate3DAnimation(start, end, 
 		centerX, centerY, 310.0f, true); 
 		rotation.setDuration(500); 
 		rotation.setFillAfter(true); 
