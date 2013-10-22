@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.gesuper.lighter.R;
 import com.gesuper.lighter.tools.Rotate3DAnimation;
-import com.gesuper.lighter.widget.MoveableListView.onItemClickedListener;
 import com.gesuper.lighter.widget.MultiGestureDetector.MultiMotionEvent;
 import com.gesuper.lighter.widget.MultiGestureDetector.OnMultiGestureListener;
 
@@ -55,6 +54,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	public final int HANDLE_LONGPRESS = 3;
 	public final int HANDLE_ITEM_EDITING = 4;
 	public final int HANDLE_FOOT = 5;
+	public final int HANDLE_MULTI = 6;
+	public final int HANDLE_MULTI_USE = 7;
 	
 	private int screenWidth;
 	private int screenHeight;
@@ -384,6 +385,25 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		Log.v(TAG, "onDown " + e.getX() + " " + e.getY());
 		TouchEvent touch = new TouchEvent(e);
 		this.addEventtoList(touch);
+		if(this.touchEvents.size() > 1 ){
+			if(this.status == HANDLE_NOTHING)
+				this.status = HANDLE_MULTI;
+			TouchEvent t1 = this.touchEvents.get(0);
+			int p1 = this.pointToPosition(
+					(int)t1.mCurrentDownEvent.getX(), 
+					(int)t1.mCurrentDownEvent.getY());
+			int p2 = this.pointToPosition((int)e.getX(), (int)e.getY());
+			if(p1 == INVALID_POSITION || p2 == INVALID_POSITION){
+				return false;
+			}
+			if(p2 < p1){
+				p2 = p2+p1;p1=p2-p1;p2=p2-p1;
+			}
+			if(p2-p1 == 1){
+				this.status = HANDLE_MULTI_USE;
+				this.currentItem = (ItemViewBase) this.getChildAt(p2 - this.getFirstVisiblePosition());
+			}
+		}
 		return false;
 	}
 	
@@ -462,6 +482,11 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		case HANDLE_FOOT:
 			this.endEditItem(this.getChildCount());
 			break;
+		case HANDLE_MULTI:
+		case HANDLE_MULTI_USE:
+			if(this.touchEvents.size() == 0)
+				this.status = HANDLE_NOTHING;
+			break;
 		}
 		return false;
 	}
@@ -508,6 +533,11 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		case HANDLE_LONGPRESS:
 			this.status = HANDLE_NOTHING;
 			stopDrag();
+			break;
+		case HANDLE_MULTI:
+		case HANDLE_MULTI_USE:
+			if(this.touchEvents.size() == 0)
+				this.status = HANDLE_NOTHING;
 			break;
 		}
 		return false;
@@ -558,6 +588,9 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			this.updateItemStatus(dX);
 			break;
 		}
+		case HANDLE_MULTI_USE:
+			Log.v(TAG, this.currentItem.getContent() + "　 " + dY + " " + distanceY );
+			this.currentItem.setPadding(0, dY, 0, 0);
 		}
 		return false;
 	}
@@ -763,7 +796,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
             iae.printStackTrace();
         }
         if (newBit != null) {
-            Log.v(TAG, "width=" + newBit.getWidth() + " height=" + newBit.getHeight());
+            //Log.v(TAG, "width=" + newBit.getWidth() + " height=" + newBit.getHeight());
             this.mHeadImage.setImageBitmap(newBit);
         }
     }

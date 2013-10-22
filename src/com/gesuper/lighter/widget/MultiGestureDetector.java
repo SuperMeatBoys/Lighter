@@ -441,8 +441,8 @@ public class MultiGestureDetector {
             for (int rIdx = 0; rIdx < ev.getPointerCount(); rIdx++) {// 因为无法确定当前发生移动的是哪个手指，所以遍历处理所有手指  
                 MultiMotionEvent e = new MultiMotionEvent(ev, rIdx);  
                 if (e.getId() >= sEventInfos.size()) {  
-                    // Log.e(MYTAG, CLASS_NAME + ":ACTION_MOVE, idx=" + rIdx + ", while sEventInfos.size()=" +  
-                    // sEventInfos.size());  
+                    Log.e(TAG, "ACTION_MOVE, idx=" + rIdx + ", while sEventInfos.size()=" +  
+                    sEventInfos.size());  
                     break;  
                 }  
                 EventInfo info = sEventInfos.get(e.getId());  
@@ -459,15 +459,15 @@ public class MultiGestureDetector {
                 // 距离上次事件移动的位置  
                 final float scrollX = x - info.mLastMotionX;  
                 final float scrollY = y - info.mLastMotionY;  
+                // 计算从落下到当前事件，移动的距离 
+                final int deltaX = (int)(x - info.mDownMotionX);  
+                final int deltaY = (int)(y - info.mDownMotionY);  
+                // Log.d(MYTAG, CLASS_NAME + "deltaX="+deltaX+";deltaY=" +  
+                // deltaX +"mTouchSlopSquare=" + mTouchSlopSquare);  
                 if (info.mAlwaysInTapRegion) {// 该手势尚未移动过（移动的距离小于mTouchSlopSquare,视为未移动过）  
-                    // 计算从落下到当前事件，移动的距离 
-                    final int deltaX = (int)(x - info.mDownMotionX);  
-                    final int deltaY = (int)(y - info.mDownMotionY);  
-                    // Log.d(MYTAG, CLASS_NAME + "deltaX="+deltaX+";deltaY=" +  
-                    // deltaX +"mTouchSlopSquare=" + mTouchSlopSquare);  
                     int distance = (deltaX * deltaX) + (deltaY * deltaY);  
                     if (distance > mTouchSlopSquare) {     // 移动距离超过mTouchSlopSquare  
-                        handled = mListener.onScroll(info.mCurrentDownEvent, e, scrollX, scrollY);  
+                        handled = mListener.onScroll(info.mCurrentDownEvent, e, deltaX, deltaY);  
                         info.mLastMotionX = e.getX();  
                         info.mLastMotionY = e.getY();  
                         info.mAlwaysInTapRegion = false;  
@@ -484,7 +484,7 @@ public class MultiGestureDetector {
                         info.mAlwaysInBiggerTapRegion = false;  
                     }  
                 } else if ((Math.abs(scrollX) >= 1) || (Math.abs(scrollY) >= 1)) {// 之前已经移动过了  
-                    handled = mListener.onScroll(info.mCurrentDownEvent, e, scrollX, scrollY);  
+                    handled = mListener.onScroll(info.mCurrentDownEvent, e,  deltaX, deltaY);  
                     info.mLastMotionX = x;
                     info.mLastMotionY = y;  
                 }  
