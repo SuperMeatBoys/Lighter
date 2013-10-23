@@ -57,6 +57,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	public final int HANDLE_MULTI = 6;
 	public final int HANDLE_MULTI_USE = 7;
 	
+	private int headLayout;
+	private int footLayout;
 	private int screenWidth;
 	private int screenHeight;
 	private LayoutInflater mInflater;
@@ -110,10 +112,12 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.initResource();
 	}
 	
-	public MoveableListView(Context context, AttributeSet attrs){
+	public MoveableListView(Context context, AttributeSet attrs, int headLayout, int footLayout){
 		super(context, attrs);
 		// TODO Auto-generated constructor stub
 		this.context = context;
+		this.headLayout = headLayout;
+		this.footLayout = footLayout;
 		this.initResource();
 	}
 	
@@ -126,6 +130,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		WindowManager wm = (WindowManager) this.context.getSystemService(Context.WINDOW_SERVICE);
 	    screenWidth = wm.getDefaultDisplay().getWidth();
 	    screenHeight = wm.getDefaultDisplay().getHeight();
+	    Log.d(TAG, "width: " + screenWidth + " height: " + screenHeight);
 		//this.setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS );
 		this.mInflater = LayoutInflater.from(this.context);
 		this.mGesture = new MultiGestureDetector(this.context, this);
@@ -135,11 +140,11 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
         
 		//init for head view
 		//this.mHeadView = new HeadViewBase(this.context);
-		this.mHeadView = (LinearLayout) mInflater.inflate(R.layout.event_head, null);
+		this.mHeadView = (LinearLayout) mInflater.inflate(this.headLayout, null);
 		this.measureView(mHeadView);
-		this.mHeadLinear = (LinearLayout) this.mHeadView.findViewById(R.id.event_head_linear);
-		this.mHeadText = (EditText) this.mHeadView.findViewById(R.id.event_content_et);
-		this.mHeadImage = (ImageView) this.mHeadView.findViewById(R.id.head_bitmap);
+		this.mHeadLinear = (LinearLayout) this.mHeadView.findViewById(R.id.item_head_linear);
+		this.mHeadText = (EditText) this.mHeadView.findViewById(R.id.item_content_et);
+		this.mHeadImage = (ImageView) this.mHeadView.findViewById(R.id.item_head_bitmap);
 		this.mHeadHeight = (int) this.context.getResources().getDimension(R.dimen.item_height);
 		this.mHeadBitmap = this.getBitmapofView(this.mHeadView);
 		this.addHeaderView(this.mHeadView);
@@ -150,12 +155,12 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.headStatus = HEAD_DONE;
 		this.itemStatus = ITEM_NORMAL;
 		
-		this.mFootView = (LinearLayout) this.mInflater.inflate(R.layout.event_foot, null);
+		this.mFootView = (LinearLayout) this.mInflater.inflate(this.footLayout, null);
 		this.measureView(this.mFootView);
-		this.mFootLinear = (LinearLayout) this.mFootView.findViewById(R.id.event_foot_linear);
-		this.mFootImage = (ImageView) this.mFootView.findViewById(R.id.event_foot_image);
-		this.mFootText = (TextView) this.mFootView.findViewById(R.id.event_content_et);
-		this.mFootPlaceHolder = this.mFootView.findViewById(R.id.event_foot_view);
+		this.mFootLinear = (LinearLayout) this.mFootView.findViewById(R.id.item_foot_linear);
+		this.mFootText = (TextView) this.mFootView.findViewById(R.id.item_content_et);
+		this.mFootImage = (ImageView) this.mFootView.findViewById(R.id.item_foot_image);
+		this.mFootPlaceHolder = this.mFootView.findViewById(R.id.item_foot_view);
 		this.mFootBitmap = this.getBitmapofView(this.mFootView);
 		this.mFootImage.setImageBitmap(this.mFootBitmap);
 		this.addFooterView(this.mFootView);
@@ -302,7 +307,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			this.mFootText.requestFocus();
 		} else {
 			scrollItemToTop(position);
-			this.currentItem.startEdit();
+			//this.currentItem.startEdit();
 		}
 	}
 	
@@ -343,12 +348,12 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	}
 	
 	@SuppressLint("NewApi")
-	private void scrollItemToTop(int position){
+	private void scrollItemToTop(final int position){
 		ViewGroup.LayoutParams p = this.mFootPlaceHolder.getLayoutParams();
 		p.height = this.screenHeight;
 		this.mFootPlaceHolder.setLayoutParams(p);
 		this.scrollY = this.getScrollY();
-		this.smoothScrollToPositionFromTop(position, 0);
+		this.smoothScrollToPositionFromTop(position, this.currentItem.getTop());
 		Log.v(TAG, "this.scrollY: " + this.scrollY);
 	}
 	
@@ -362,7 +367,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	private void hideBelowItems(int index) {
 		// TODO Auto-generated method stub
 		int total = this.getAdapter().getCount() - this.getFooterViewsCount();
-		for(int i = index +1 ;i < total;i++){
+		for(int i = index +1 ;i < total ; i++){
 			ItemViewBase v = (ItemViewBase) this.getChildAt(i - this.getFirstVisiblePosition());
 			if(v != null){
 				v.halfAlpha();
@@ -370,8 +375,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		}
 	}
 	private void showBelowItems(int index){
-		int total = this.getAdapter().getCount();
-		for(int i = index +1 ;i < total - 1;i++){
+		int total = this.getAdapter().getCount() - this.getFooterViewsCount();;
+		for(int i = index +1 ;i < total ; i++){
 			ItemViewBase v = (ItemViewBase) this.getChildAt(i - this.getFirstVisiblePosition());
 			if(v != null){
 				v.noneAlpha();
@@ -489,11 +494,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			break;
 		}
 		return false;
-	}
-	
-	private void startBottomAnimal() {
-		// TODO Auto-generated method stub
-		Log.v(TAG, "bottom animation");
 	}
 
 	@Override
