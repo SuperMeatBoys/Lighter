@@ -65,6 +65,11 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	protected Context context;
 	private MultiGestureDetector mGesture;
 	private List<TouchEvent> touchEvents;
+	private int belowTouch;
+	private int upTouch;
+	private ItemViewBase belowItem;
+	private ItemViewBase upItem;
+	private int dh;
 	private int status;
 	
 	//field for create new 
@@ -136,6 +141,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.mGesture = new MultiGestureDetector(this.context, this);
 		this.mGesture.setIsLongpressEnabled(true);
 		this.touchEvents = new ArrayList<TouchEvent>();
+		this.belowTouch = 0; this.upTouch = 1;
         this.status = HANDLE_NOTHING;
         
 		//init for head view
@@ -390,6 +396,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		Log.v(TAG, "onDown " + e.getX() + " " + e.getY());
 		TouchEvent touch = new TouchEvent(e);
 		this.addEventtoList(touch);
+		//Multi touch
 		if(this.touchEvents.size() > 1 ){
 			if(this.status == HANDLE_NOTHING)
 				this.status = HANDLE_MULTI;
@@ -403,11 +410,19 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			}
 			if(p2 < p1){
 				p2 = p2+p1;p1=p2-p1;p2=p2-p1;
+				this.belowTouch=0;
+				this.upTouch = 1;
+			} else {
+				this.belowTouch=1;
+				this.upTouch = 0;
 			}
 			if(p2-p1 == 1){
 				this.status = HANDLE_MULTI_USE;
-				this.currentItem = (ItemViewBase) this.getChildAt(p2 - this.getFirstVisiblePosition());
+				//this.currentItem = (ItemViewBase) this.getChildAt(p2 - this.getFirstVisiblePosition());
+				this.belowItem = (ItemViewBase) this.getChildAt(p2 - this.getFirstVisiblePosition());
+				this.upItem = (ItemViewBase) this.getChildAt(p1 - this.getFirstVisiblePosition());
 			}
+			this.dh = 0;
 		}
 		return false;
 	}
@@ -489,6 +504,12 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			break;
 		case HANDLE_MULTI:
 		case HANDLE_MULTI_USE:
+			if(e.getId() == this.upTouch){
+				this.setPadding(0, 0, 0, 0);
+				this.upItem.setPadding(0, 0, 0, 0);
+			} else if(e.getId() == this.belowTouch){
+				this.belowItem.setPadding(0, 0, 0, 0);
+			}
 			if(this.touchEvents.size() == 0)
 				this.status = HANDLE_NOTHING;
 			break;
@@ -536,6 +557,12 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			break;
 		case HANDLE_MULTI:
 		case HANDLE_MULTI_USE:
+			if(e1.getId() == this.upTouch){
+				this.setPadding(0, 0, 0, 0);
+				this.upItem.setPadding(0, 0, 0, 0);
+			} else if(e1.getId() == this.belowTouch){
+				this.belowItem.setPadding(0, 0, 0, 0);
+			}
 			if(this.touchEvents.size() == 0)
 				this.status = HANDLE_NOTHING;
 			break;
@@ -589,8 +616,13 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			break;
 		}
 		case HANDLE_MULTI_USE:
-			Log.v(TAG, this.currentItem.getContent() + "　 " + dY + " " + distanceY );
-			this.currentItem.setPadding(0, dY, 0, 0);
+			if(this.belowTouch == e1.getId())
+				this.belowItem.setPadding(0, dY, 0, 0);
+			else if(this.upTouch == e1.getId() && dY <0){
+				//this.upItem.setPadding(0, 0, 0, -dY);
+				this.setPadding(0, this.getPaddingTop() + dY, 0, 0);
+				this.upItem.setPadding(0, 0, 0, -dY);
+			}
 		}
 		return false;
 	}
