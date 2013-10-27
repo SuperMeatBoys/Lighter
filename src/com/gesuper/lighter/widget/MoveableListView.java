@@ -69,7 +69,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	private int upTouch;
 	private ItemViewBase belowItem;
 	private ItemViewBase upItem;
-	private int dh;
+	private int initPaddingTop;
 	private int status;
 	
 	//field for create new 
@@ -263,10 +263,14 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			y = this.mHeadHeight;
 			break;
 		case HEAD_DONE:
+			if(y>0){
+				this.headStatus = HEAD_PULL;	
+			} else {
 			y = 0;
-			this.mHeadLinear.setVisibility(View.GONE);
-			this.mHeadImage.setVisibility(View.VISIBLE);
-			break;
+				this.mHeadLinear.setVisibility(View.GONE);
+				this.mHeadImage.setVisibility(View.VISIBLE);
+				break;
+			}
 		}
 		
 		if(this.headStatus == HEAD_PULL){
@@ -393,36 +397,44 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	@Override
 	public boolean onDown(MultiMotionEvent e) {
 		// TODO Auto-generated method stub
-		Log.v(TAG, "onDown " + e.getX() + " " + e.getY());
 		TouchEvent touch = new TouchEvent(e);
 		this.addEventtoList(touch);
+		Log.v(TAG, "onDown " + e.getX() + " " + e.getY() + " " + e.getId());
 		//Multi touch
-		if(this.touchEvents.size() > 1 ){
-			if(this.status == HANDLE_NOTHING)
+		if(this.getFingerCount() > 1 ){
+			//clear other motions
+			//if(this.status == HANDLE_NOTHING){
 				this.status = HANDLE_MULTI;
+			//}
 			TouchEvent t1 = this.touchEvents.get(0);
 			int p1 = this.pointToPosition(
 					(int)t1.mCurrentDownEvent.getX(), 
 					(int)t1.mCurrentDownEvent.getY());
+			Log.v(TAG, "First touch Position: " + p1);
 			int p2 = this.pointToPosition((int)e.getX(), (int)e.getY());
-			if(p1 == INVALID_POSITION || p2 == INVALID_POSITION){
+			if(p1 == INVALID_POSITION){
 				return false;
-			}
-			if(p2 < p1){
-				p2 = p2+p1;p1=p2-p1;p2=p2-p1;
-				this.belowTouch=0;
-				this.upTouch = 1;
 			} else {
-				this.belowTouch=1;
-				this.upTouch = 0;
+				if(t1.mCurrentDownEvent.getY() < e.getY()){
+					p2 = p1 + 1;
+					this.belowTouch=1;
+					this.upTouch = 0;
+				} else {
+					p2 = p1;
+					p1 = p2 - 1;
+					this.belowTouch=0;
+					this.upTouch = 1;
+				}
 			}
-			if(p2-p1 == 1){
-				this.status = HANDLE_MULTI_USE;
-				//this.currentItem = (ItemViewBase) this.getChildAt(p2 - this.getFirstVisiblePosition());
+			try{
 				this.belowItem = (ItemViewBase) this.getChildAt(p2 - this.getFirstVisiblePosition());
 				this.upItem = (ItemViewBase) this.getChildAt(p1 - this.getFirstVisiblePosition());
+			} catch(ClassCastException error){
+				Log.v(TAG, "ClassCastException");
+				return false;
 			}
-			this.dh = 0;
+			this.status = HANDLE_MULTI_USE;
+			this.initPaddingTop = this.getPaddingTop();
 		}
 		return false;
 	}
@@ -461,7 +473,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				if(this.currentItem.isNeedFocus((int)e.getOffsetX(), (int)e.getOffsetY() - this.currentItem.getTop())){
 					this.startEditItem(position);
 					this.status = HANDLE_ITEM_EDITING;
-				}else {
+				}else if(this.itemClickedListener != null){
 					this.itemClickedListener.onItemClicked(position);
 				}
 			}
@@ -503,6 +515,12 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			this.endEditItem(this.getChildCount());
 			break;
 		case HANDLE_MULTI:
+			if(this.getFingerCount() == 0){
+				this.setPadding(0, initPaddingTop, 0, 0);
+				Log.v(TAG, "no finger on screen");
+				this.status = HANDLE_NOTHING;
+			}
+			break;
 		case HANDLE_MULTI_USE:
 			if(e.getId() == this.upTouch){
 				this.setPadding(0, 0, 0, 0);
@@ -510,8 +528,12 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			} else if(e.getId() == this.belowTouch){
 				this.belowItem.setPadding(0, 0, 0, 0);
 			}
-			if(this.touchEvents.size() == 0)
+			Log.v(TAG, "" + this.getFingerCount() + " fingers in on screen" );
+			if(this.getFingerCount() == 0){
+				this.setPadding(0, initPaddingTop, 0, 0);
+				Log.v(TAG, "no finger on screen");
 				this.status = HANDLE_NOTHING;
+			}
 			break;
 		}
 		return false;
@@ -556,6 +578,12 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			stopDrag();
 			break;
 		case HANDLE_MULTI:
+			if(this.getFingerCount() == 0){
+				this.setPadding(0, initPaddingTop, 0, 0);
+				Log.v(TAG, "no finger on screen");
+				this.status = HANDLE_NOTHING;
+			}
+			break;
 		case HANDLE_MULTI_USE:
 			if(e1.getId() == this.upTouch){
 				this.setPadding(0, 0, 0, 0);
@@ -563,8 +591,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			} else if(e1.getId() == this.belowTouch){
 				this.belowItem.setPadding(0, 0, 0, 0);
 			}
-			if(this.touchEvents.size() == 0)
+			if(this.getFingerCount() == 0){
+				this.setPadding(0, initPaddingTop, 0, 0);
 				this.status = HANDLE_NOTHING;
+			}
 			break;
 		}
 		return false;
@@ -594,7 +624,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.updateItemStatus(dX);
 			} else if(Math.abs(dY) > 2*Math.abs(dX)){
 				//竖直滚动
-				Log.v(TAG, "FirstVisiblePosition" + this.getFirstVisiblePosition());
 				if(this.getFirstVisiblePosition() == 0 && this.status != HANDLE_ITEM_MOVE){
 					this.status = HANDLE_HEAD;
 					this.headStatus = HEAD_PULL;
@@ -619,8 +648,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			if(this.belowTouch == e1.getId())
 				this.belowItem.setPadding(0, dY, 0, 0);
 			else if(this.upTouch == e1.getId() && dY <0){
-				//this.upItem.setPadding(0, 0, 0, -dY);
-				this.setPadding(0, this.getPaddingTop() + dY, 0, 0);
+				this.setPadding(0, this.initPaddingTop + dY, 0, 0);
 				this.upItem.setPadding(0, 0, 0, -dY);
 			}
 		}
@@ -742,23 +770,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		return this.mGesture.onTouchEvent(event);
 	}
 	
-//	private void measureView(View child) {  
-//        ViewGroup.LayoutParams p = child.getLayoutParams();  
-//        if (p == null) {  
-//            p = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,  
-//                    ViewGroup.LayoutParams.WRAP_CONTENT);  
-//        }  
-//        int childWidthSpec = ViewGroup.getChildMeasureSpec(0, 0 + 0, p.width);  
-//        int lpHeight = p.height;  
-//        int childHeightSpec;  
-//        if (lpHeight > 0) {  
-//            childHeightSpec = MeasureSpec.makeMeasureSpec(lpHeight, MeasureSpec.EXACTLY);  
-//        } else {  
-//            childHeightSpec = MeasureSpec.makeMeasureSpec(0,  MeasureSpec.UNSPECIFIED);  
-//        }  
-//        child.measure(childWidthSpec, childHeightSpec);  
-//    }
-	
 	private class TouchEvent{
         private MultiMotionEvent mCurrentDownEvent;
         private boolean isLongPress;
@@ -799,6 +810,16 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
         } else {  
             // Log.e(MYTAG, CLASS_NAME + ".addEventIntoList, invalidata id !");  
         }  
+    }
+    
+    private int getFingerCount(){
+    	int count = 0;
+    	for(int i=0;i<this.touchEvents.size();i++){
+    		if(this.touchEvents.get(i) != null){
+    			count +=1;
+    		}
+    	}
+    	return count;
     }
     
     private void roateHeadViewX(float height){
