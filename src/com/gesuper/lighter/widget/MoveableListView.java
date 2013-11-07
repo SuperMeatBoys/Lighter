@@ -92,6 +92,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	// field for item 
 	private int itemStatus;
 	private ItemViewBase currentItem;
+	private ImageView createImage;
 	private int scrollY;
 	
 	//field for long press
@@ -208,6 +209,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			public void onAnimationStart(Animation arg0) {}
 		});
 		this.mTouchSlop = ViewConfiguration.get(this.getContext()).getScaledTouchSlop();
+		this.createImage = null;
 	}
 	
 	public void setOnCreateNewItem(OnCreateNewItemListener listener){
@@ -274,7 +276,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		}
 		
 		if(this.headStatus == HEAD_PULL){
-			this.roateHeadViewX(y);
+			Bitmap map = this.roateImageView(this.mHeadBitmap, 0, y, 0);
+			this.mHeadImage.setImageBitmap(map);
 		}
 		this.updateHeadText();
 		this.mHeadView.setPadding(0, y - this.mHeadHeight, 0, 0);
@@ -428,6 +431,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			}
 			try{
 				this.belowItem = (ItemViewBase) this.getChildAt(p2 - this.getFirstVisiblePosition());
+				this.createImage = (ImageView) this.belowItem.findViewById(R.id.item_create_image);
+				this.createImage.setVisibility(View.VISIBLE);
 				this.upItem = (ItemViewBase) this.getChildAt(p1 - this.getFirstVisiblePosition());
 			} catch(ClassCastException error){
 				Log.v(TAG, "ClassCastException");
@@ -528,10 +533,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			} else if(e.getId() == this.belowTouch){
 				this.belowItem.setPadding(0, 0, 0, 0);
 			}
-			Log.v(TAG, "" + this.getFingerCount() + " fingers in on screen" );
 			if(this.getFingerCount() == 0){
 				this.setPadding(0, initPaddingTop, 0, 0);
-				Log.v(TAG, "no finger on screen");
+				this.createImage.setImageBitmap(null);
+				this.createImage.setPadding(0, 0, 0, 0);
 				this.status = HANDLE_NOTHING;
 			}
 			break;
@@ -593,6 +598,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			}
 			if(this.getFingerCount() == 0){
 				this.setPadding(0, initPaddingTop, 0, 0);
+				this.createImage.setImageBitmap(null);
+				this.createImage.setPadding(0, 0, 0, 0);
 				this.status = HANDLE_NOTHING;
 			}
 			break;
@@ -645,8 +652,18 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			break;
 		}
 		case HANDLE_MULTI_USE:
-			if(this.belowTouch == e1.getId())
-				this.belowItem.setPadding(0, dY, 0, 0);
+			if(this.belowTouch == e1.getId()){
+				if(dY<this.mHeadHeight){
+					Bitmap map = this.roateImageView(this.mFootBitmap, 0,dY,0);
+					this.createImage.setImageBitmap(map);
+					this.createImage.setPadding(0, 0, 0, 0);
+				}
+				else {
+					Bitmap map = this.roateImageView(this.mFootBitmap, 0,this.mHeadHeight,0);
+					this.createImage.setImageBitmap(map);
+					this.createImage.setPadding(0, 0, 0, dY - this.mHeadHeight);
+				}
+			}
 			else if(this.upTouch == e1.getId() && dY <0){
 				this.setPadding(0, this.initPaddingTop + dY, 0, 0);
 				this.upItem.setPadding(0, 0, 0, -dY);
@@ -822,8 +839,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
     	return count;
     }
     
-    private void roateHeadViewX(float height){
-    	float angle = (float) (Math.acos(height / this.mHeadBitmap.getHeight())*(180/Math.PI));
+    private Bitmap roateImageView(Bitmap bitmap, float x, float y, float z){
+    	float angle = (float) (Math.acos(y / bitmap.getHeight())*(180/Math.PI));
     	Camera camera = new Camera();
         camera.save();
         Matrix matrix = new Matrix();
@@ -837,21 +854,18 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
         // 恢复到之前的初始状态。
         camera.restore();
         // 设置图像处理的中心点
-        int w = this.mHeadBitmap.getWidth()/2;
-        int h = this.mHeadBitmap.getHeight()/2;
+        int w = bitmap.getWidth()/2;
+        int h = bitmap.getHeight()/2;
         matrix.preTranslate(-w, 0);
         matrix.postTranslate(w, 0); 
         Bitmap newBit = null;
         try {
             // 经过矩阵转换后的图像宽高有可能不大于0，此时会抛出IllegalArgumentException
-            newBit = Bitmap.createBitmap(this.mHeadBitmap, 0, 0, this.mHeadBitmap.getWidth(), this.mHeadBitmap.getHeight(), matrix, false);
+            newBit = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
         } catch (IllegalArgumentException iae) {
             iae.printStackTrace();
         }
-        if (newBit != null) {
-            //Log.v(TAG, "width=" + newBit.getWidth() + " height=" + newBit.getHeight());
-            this.mHeadImage.setImageBitmap(newBit);
-        }
+        return newBit;
     }
     
     private Bitmap getBitmapofView(ViewGroup view) {
