@@ -8,7 +8,6 @@ import com.gesuper.lighter.tools.Rotate3DAnimation;
 import com.gesuper.lighter.widget.MultiGestureDetector.MultiMotionEvent;
 import com.gesuper.lighter.widget.MultiGestureDetector.OnMultiGestureListener;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Camera;
@@ -360,7 +359,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		}
 	}
 	
-	@SuppressLint("NewApi")
 	private void scrollItemToTop(final int position){
 		ViewGroup.LayoutParams p = this.mFootPlaceHolder.getLayoutParams();
 		p.height = this.screenHeight;
@@ -638,10 +636,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				}
 			}
 		}
-		case HANDLE_LONGPRESS:{
+		case HANDLE_LONGPRESS:{ 
 			dragView((int) e2.getOffsetY());
  			//adjustScrollBounds(this.mCurrentY);
-			break;
+			return true;
 		}
 		case HANDLE_HEAD:{
 			this.updateHeadStatus(dY);

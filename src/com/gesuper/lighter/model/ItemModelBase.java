@@ -1,8 +1,6 @@
 package com.gesuper.lighter.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
@@ -28,18 +26,18 @@ public class ItemModelBase {
 	private static final int SEQUENCE_COLUMN = 4;
 	private static final int STATUS_COLUMN = 5;
 	
-	private int id;
-	private long createDate;
-	private long modifyDate;
-	private String content;
-	private int sequence;
-	private short finished;
+	protected int id;
+	protected long createDate;
+	protected long modifyDate;
+	protected String content;
+	protected int sequence;
+	protected short finished;
 	
-	public ItemModelBase(Context context) {
+	protected ItemModelBase(Context context) {
 		// TODO Auto-generated constructor stub
 	}
 
-	public ItemModelBase(Context context, Cursor cursor) {
+	protected ItemModelBase(Context context, Cursor cursor) {
 		// TODO Auto-generated constructor stub
 		this.id = cursor.getInt(ID_COLUMN);
 		this.createDate = cursor.getLong(CREATE_DATE_COLUMN);
@@ -49,13 +47,33 @@ public class ItemModelBase {
 		this.finished = cursor.getShort(STATUS_COLUMN);
 	}
 	
-	public ItemModelBase(Context context, String content){
+	protected ItemModelBase(Context context, String content){
 		this.id = -1;
 		this.createDate = System.currentTimeMillis();
 		this.modifyDate = System.currentTimeMillis();
 		this.content = content;
 		this.sequence = 0;
 		this.finished = 0;
+	}
+	
+	protected ContentValues formatContentValues(){
+		ContentValues cv = this.formatContentValuesWithoutId();
+		cv.put(ID, this.id);
+		return cv;
+	}
+	
+	protected ContentValues formatContentValuesWithoutId(){
+		ContentValues cv = new ContentValues();
+		cv.put(CREATE_DATE, this.createDate);
+		cv.put(MODIFY_DATE, this.modifyDate);
+		cv.put(CONTENT, this.content);
+		cv.put(SEQUENCE, this.sequence);
+		cv.put(STATUS, this.finished);
+		return cv;
+	}
+	
+	public int getId(){
+		return this.id;
 	}
 	
 	public void setId(int id){

@@ -1,5 +1,6 @@
 package com.gesuper.lighter.model;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
@@ -36,5 +37,17 @@ public class CaseModel extends ItemModelBase{
 	
 	public int getEventId(){
 		return this.eventId;
+	}
+	
+	public ContentValues formatContentValues(){
+		ContentValues cv = this.formatContentValuesWithoutId();
+		cv.put(ID, this.id);
+		return cv;
+	}
+	
+	public ContentValues formatContentValuesWithoutId(){
+		ContentValues cv = this.formatContentValuesWithoutId();
+		cv.put(EVENT_ID, this.eventId);
+		return cv;
 	}
 }

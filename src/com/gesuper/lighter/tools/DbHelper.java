@@ -9,7 +9,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 public class DbHelper extends SQLiteOpenHelper{
 
@@ -46,7 +45,7 @@ public class DbHelper extends SQLiteOpenHelper{
 			")";
 	private SQLiteDatabase db;
 	
-	public static DbHelper instance;
+	private static DbHelper instance;
 	
 	public DbHelper(Context context){
 		super(context, DB_NAME, null, DB_VERSION);

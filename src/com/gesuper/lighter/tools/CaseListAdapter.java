@@ -14,10 +14,8 @@ public class CaseListAdapter extends BaseAdapter{
 	
 	private List<CaseModel> listItems;
 	private Context context;
-	private int resourceId;
 	public CaseListAdapter(Context context, int textViewResourceId, List<CaseModel> objects) {
 		this.context = context;
-		this.resourceId = textViewResourceId;
 		this.listItems = objects;
 	}
 

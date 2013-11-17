@@ -3,6 +3,7 @@ package com.gesuper.lighter.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
@@ -55,5 +56,17 @@ public class EventModel extends ItemModelBase{
 	public void removeCase(int i){
 		this.cases.remove(i);
 		this.count -= 1;
+	}
+	
+	public ContentValues formatContentValues(){
+		ContentValues cv = this.formatContentValuesWithoutId();
+		cv.put(ID, this.id);
+		return cv;
+	}
+	
+	public ContentValues formatContentValuesWithoutId(){
+		ContentValues cv = this.formatContentValuesWithoutId();
+		cv.put(COUNT, this.count);
+		return cv;
 	}
 }

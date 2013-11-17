@@ -1,23 +1,12 @@
 package com.gesuper.lighter.widget;
 
-import com.gesuper.lighter.R;
-import com.gesuper.lighter.ui.TestActivity;
-
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.graphics.BitmapFactory;
-import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 public class HeadViewBase extends FrameLayout {
 	public final static String TAG = "HeadViewBase";

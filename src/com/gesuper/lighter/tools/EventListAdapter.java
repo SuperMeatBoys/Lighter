@@ -6,10 +6,8 @@ import com.gesuper.lighter.model.EventModel;
 import com.gesuper.lighter.widget.EventItemView;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 
 public class EventListAdapter extends BaseAdapter{
@@ -17,10 +15,8 @@ public class EventListAdapter extends BaseAdapter{
 	
 	private List<EventModel> listItems;
 	private Context context;
-	private int resourceId;
 	public EventListAdapter(Context context, int textViewResourceId, List<EventModel> objects) {
 		this.context = context;
-		this.resourceId = textViewResourceId;
 		this.listItems = objects;
 	}
 

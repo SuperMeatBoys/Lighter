@@ -1,7 +1,6 @@
 package com.gesuper.lighter.widget;
 
 import com.gesuper.lighter.R;
-import com.gesuper.lighter.model.EventModel;
 import com.gesuper.lighter.model.ItemModelBase;
 
 import android.content.Context;
@@ -30,6 +29,11 @@ public class ItemViewBase extends FrameLayout {
 	protected Rect focusRect;
 	private AlphaAnimation alphaAnimation;
 	private int status;
+	
+	public ItemViewBase(Context context){
+		super(context);
+	}
+	
 	public ItemViewBase(Context context, int layoutId) {
 		super(context);
 		// TODO Auto-generated constructor stub
