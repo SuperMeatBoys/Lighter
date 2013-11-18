@@ -12,35 +12,35 @@ import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
 
 public class MultiGestureDetector {
-	public static final String TAG = "MutiGestureDetector";
-	
-	/** 
+    public static final String TAG = "MutiGestureDetector";
+    
+    /** 
      * 事件信息类 <br/> 
      * 用来记录一个手势 
      */  
-    private class EventInfo {  
+    public class EventInfo {  
         private MultiMotionEvent  mCurrentDownEvent;    // 当前的down事件 
-        private boolean mStillDown;                    // 当前手指是否还在屏幕上  
-        private boolean mInLongPress;                // 当前事件是否属于长按手势  
         private boolean mAlwaysInTapRegion;            // 是否当前手指仅在小范围内移动，当手指仅在小范围内移动时，视为手指未曾移动过，不会触发onScroll手势  
-        private boolean mAlwaysInBiggerTapRegion;    // 是否当前手指在较大范围内移动，仅当此值为true时，双击手势才能成立  
+        //private boolean mAlwaysInBiggerTapRegion;    // 是否当前手指在较大范围内移动，仅当此值为true时，双击手势才能成立  
         private float mLastMotionY;                    // 最后一次事件的X坐标  
         private float mLastMotionX;                    // 最后一次事件的Y坐标 
-        private float mDownMotionX;					//首次事件的X坐标
-        private float mDownMotionY;						//首次事件的Y坐标
+        private float mDownMotionX;                 //首次事件的X坐标
+        private float mDownMotionY;                     //首次事件的Y坐标
         
         private EventInfo(MotionEvent e){
-        	this(new MultiMotionEvent(e));
+            this(new MultiMotionEvent(e));
         }
         
         private EventInfo(MultiMotionEvent me) {  
             mCurrentDownEvent = me;  
-            mStillDown = true;  
-            mInLongPress = false;  
             mAlwaysInTapRegion = true;  
-            mAlwaysInBiggerTapRegion = true;
-        }  
-  
+            //mAlwaysInBiggerTapRegion = true;
+        } 
+        
+        public MultiMotionEvent getCurrentDownEvent(){
+            return this.mCurrentDownEvent;
+        }
+        
         // 释放MotionEven对象，使系统能够继续使用它们  
         public void recycle() {  
             if (mCurrentDownEvent != null) {  
@@ -70,7 +70,7 @@ public class MultiGestureDetector {
   
         private MultiMotionEvent(MotionEvent e) {  
             mEvent = e;  
-            mIndex = (e.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT;  
+            mIndex = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;  
             // 等效于  mEvent.getActionIndex();  
         }  
   
@@ -137,58 +137,58 @@ public class MultiGestureDetector {
         }  
     } 
     
-	public interface OnMultiGestureListener {
-		/**
-		 * 手指触摸屏幕，由ACTION_DOWN, ACTION_POINTER_DOWN触发
-		 * @param e
-		 * @return
-		 */
-		boolean onDown(MultiMotionEvent e);
-		
-		/**
-		 * 手指离开屏幕， 有ACTION_UP, ACTION_POINTER_UP触发
-		 * @param e
-		 * @return
-		 */
-		boolean onSingleTapUp(MultiMotionEvent e);
-		
-		/*
-		 * 手指在屏幕上按了片刻后抬起
-		 * @param e
-		 */
-		void onShowPress(MultiMotionEvent e);
-		
-		/*
-		 * 手指在屏幕上按了较长时间后抬起
-		 * @param e
-		 */
-		void onLongPress(MultiMotionEvent e);
-		
-		/**
-		 * 手指在屏幕上移动
-		 * @param e1
-		 * @param e2
-		 * @param distanceX
-		 * @param distanceY
-		 * @return
-		 */
-		boolean onScroll(MultiMotionEvent e1, MultiMotionEvent e2, float distanceX, float distanceY);
-		
-		/*
-		 * 手指在屏幕上快速滑动
-		 * @param e1
-		 * @param e2
-		 * @param velocityX
-		 * @param velocityY
-		 * @return 
-		 */
-		boolean onFling(MultiMotionEvent e1, MultiMotionEvent e2, float velocityX, float velocityY);
-	}
-	
-	// 事件信息队列，队列的下标与MotionEvent的pointId对应  
+    public interface OnMultiGestureListener {
+        /**
+         * 手指触摸屏幕，由ACTION_DOWN, ACTION_POINTER_DOWN触发
+         * @param e
+         * @return
+         */
+        boolean onDown(MultiMotionEvent e);
+        
+        /**
+         * 手指离开屏幕， 有ACTION_UP, ACTION_POINTER_UP触发
+         * @param e
+         * @return
+         */
+        boolean onSingleTapUp(MultiMotionEvent e);
+        
+        /*
+         * 手指在屏幕上按了片刻后抬起
+         * @param e
+         */
+        void onShowPress(MultiMotionEvent e);
+        
+        /*
+         * 手指在屏幕上按了较长时间后抬起
+         * @param e
+         */
+        void onLongPress(MultiMotionEvent e);
+        
+        /**
+         * 手指在屏幕上移动
+         * @param e1
+         * @param e2
+         * @param distanceX
+         * @param distanceY
+         * @return
+         */
+        boolean onScroll(MultiMotionEvent e1, MultiMotionEvent e2, float distanceX, float distanceY);
+        
+        /*
+         * 手指在屏幕上快速滑动
+         * @param e1
+         * @param e2
+         * @param velocityX
+         * @param velocityY
+         * @return 
+         */
+        boolean onFling(MultiMotionEvent e1, MultiMotionEvent e2, float velocityX, float velocityY);
+    }
+    
+    // 事件信息队列，队列的下标与MotionEvent的pointId对应  
     private static List<EventInfo> sEventInfos = new ArrayList<EventInfo>(10);  
     // 指定大点击区域的大小（这个比较拗口），这个值主要用于帮助判断双击是否成立  
-    private int mBiggerTouchSlopSquare = 20 * 20;  
+    //private int mBiggerTouchSlopSquare = 20 * 20;  
     // 判断是否构成onScroll手势，当手指在这个范围内移动时，不触发onScroll手势  
     private int mTouchSlopSquare;
     // 最小滑动速度  
@@ -201,7 +201,7 @@ public class MultiGestureDetector {
     // showPress手势的触发阀值，当手指按下后，在该阀值的时间内，未移动超过mTouchSlopSquare的距离并未抬起，则showPress手势触发  
     private static final int TAP_TIMEOUT = ViewConfiguration.getTapTimeout();  
     
-	// GestureHandler所处理的Message的what属性可能为以下 常量：  
+    // GestureHandler所处理的Message的what属性可能为以下 常量：  
     // showPress手势  
     private static final int SHOW_PRESS = 1;  
     // 长按手势  
@@ -219,20 +219,20 @@ public class MultiGestureDetector {
     // 速度追踪器  
     private VelocityTracker mVelocityTracker;
     
-	private class MultiGestureHandler extends Handler {
-		MultiGestureHandler(){
-			super();
-		}
-		
-		MultiGestureHandler(Handler handler){
-			super(handler.getLooper());
-		}
-		
-		public void handleMessage(Message msg){
-			int idx = (Integer) msg.obj;
-			switch(msg.what){
-			case SHOW_PRESS:{
-				if (idx >= sEventInfos.size()) {  
+    private class MultiGestureHandler extends Handler {
+        MultiGestureHandler(){
+            super();
+        }
+        
+        MultiGestureHandler(Handler handler){
+            super(handler.getLooper());
+        }
+        
+        public void handleMessage(Message msg){
+            int idx = (Integer) msg.obj;
+            switch(msg.what){
+            case SHOW_PRESS:{
+                if (idx >= sEventInfos.size()) {  
                     // Log.w(MYTAG, CLASS_NAME + ":handleMessage, msg.what = SHOW_PRESS, idx=" + idx +  
                     // ", while sEventInfos.size()="  
                     // + sEventInfos.size());  
@@ -247,9 +247,9 @@ public class MultiGestureDetector {
                 // 触发手势监听器的onShowPress事件  
                 mListener.onShowPress(info.mCurrentDownEvent);  
                 break;  
-			}
-			case LONG_PRESS:{
-				if (idx >= sEventInfos.size()) {  
+            }
+            case LONG_PRESS:{
+                if (idx >= sEventInfos.size()) {  
                     // Log.w(MYTAG, CLASS_NAME + ":handleMessage, msg.what = SHOW_PRESS, idx=" + idx +  
                     // ", while sEventInfos.size()="  
                     // + sEventInfos.size());  
@@ -263,17 +263,17 @@ public class MultiGestureDetector {
                 }  
                 // 触发手势监听器的onLongPress事件  
                 //mHandler.removeMessages(TAP_SINGLE, idx);// 移除单击事件确认  
-                info.mInLongPress = true;  
+                //info.mInLongPress = true;  
                 mListener.onLongPress(info.mCurrentDownEvent);  
                 break;  
-			}
-			case TAP_SINGLE:
-				break;
-			}
-		}
-	}
-	
-	 /** 
+            }
+            case TAP_SINGLE:
+                break;
+            }
+        }
+    }
+    
+     /** 
      * 构造器1 
      * @param context 
      * @param listener 
@@ -304,10 +304,11 @@ public class MultiGestureDetector {
         }  
         mIsLongpressEnabled = true;  
         int touchSlop;  
-        if (context == null) {  
-            touchSlop = ViewConfiguration.getTouchSlop();
-            mMinimumFlingVelocity = ViewConfiguration.getMinimumFlingVelocity();  
-            mMaximumFlingVelocity = ViewConfiguration.getMaximumFlingVelocity();  
+        if (context == null) {
+            ViewConfiguration vc = ViewConfiguration.get(context);
+            touchSlop = vc.getScaledTouchSlop();
+            mMinimumFlingVelocity = vc.getScaledMinimumFlingVelocity();  
+            mMaximumFlingVelocity = vc.getScaledMaximumFlingVelocity();  
         } else {// 允许识别器在App中，使用偏好的设定  
             final ViewConfiguration configuration = ViewConfiguration.get(context);  
             touchSlop = configuration.getScaledTouchSlop(); 
@@ -355,7 +356,21 @@ public class MultiGestureDetector {
         } else {  
             // Log.e(MYTAG, CLASS_NAME + ".addEventIntoList, invalidata id !");  
         }  
-    } 
+    }
+    
+    public int getFingerCount(){
+        int count = 0, len = sEventInfos.size();
+        for(int i=0;i<len;i++){
+            if(sEventInfos.get(i) != null){
+                count +=1;
+            }
+        }
+        return count;
+    }
+    
+    public EventInfo getEventInfoAt(int id){
+        return sEventInfos.get(id);
+    }
     
     public boolean onTouchEvent(MotionEvent ev) {  
         if (mVelocityTracker == null) {  
@@ -397,8 +412,8 @@ public class MultiGestureDetector {
             if (info == null) {  
                 Log.e(TAG, "ACTION_POINTER_UP, idx=" + idx + ", Info = null");  
                 break;  
-            }  
-            info.mStillDown = false;  
+            }
+            
             //if (info.mInLongPress) {// 处于长按状态  
             //    mHandler.removeMessages(TAP_SINGLE, idx);// 可以无视这行代码  
             //    info.mInLongPress = false;  
@@ -418,7 +433,7 @@ public class MultiGestureDetector {
                 if ((Math.abs(velocityY) > mMinimumFlingVelocity) || (Math.abs(velocityX) > mMinimumFlingVelocity)) {  
                     handled = mListener.onFling(info.mCurrentDownEvent, currentUpEvent, velocityX, velocityY);  
                 }else {
-                	handled = mListener.onSingleTapUp(currentUpEvent);// 触发onSingleTapUp事件  
+                    handled = mListener.onSingleTapUp(currentUpEvent);// 触发onSingleTapUp事件  
                 }
             }  
             // Hold the event we obtained above - listeners may have changed the  
@@ -480,9 +495,9 @@ public class MultiGestureDetector {
                         mHandler.removeMessages(SHOW_PRESS, id);  
                         mHandler.removeMessages(LONG_PRESS, id);  
                     }  
-                    if (distance > mBiggerTouchSlopSquare) {// 移动距离大于mBiggerTouchSlopSquare，则无法构成双击事件  
-                        info.mAlwaysInBiggerTapRegion = false;  
-                    }  
+                    //if (distance > mBiggerTouchSlopSquare) {// 移动距离大于mBiggerTouchSlopSquare，则无法构成双击事件  
+                    //    info.mAlwaysInBiggerTapRegion = false;  
+                    //}  
                 } else if ((Math.abs(scrollX) >= 1) || (Math.abs(scrollY) >= 1)) {// 之前已经移动过了  
                     handled = mListener.onScroll(info.mCurrentDownEvent, e,  deltaX, deltaY);  
                     info.mLastMotionX = x;

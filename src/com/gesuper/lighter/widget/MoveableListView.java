@@ -398,8 +398,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	@Override
 	public boolean onDown(MultiMotionEvent e) {
 		// TODO Auto-generated method stub
-		TouchEvent touch = new TouchEvent(e);
-		this.addEventtoList(touch);
 		Log.v(TAG, "onDown " + e.getX() + " " + e.getY() + " " + e.getId());
 		//Multi touch
 		if(this.getFingerCount() > 1 ){
@@ -407,10 +405,11 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			//if(this.status == HANDLE_NOTHING){
 				this.status = HANDLE_MULTI;
 			//}
-			TouchEvent t1 = this.touchEvents.get(0);
+			MultiMotionEvent m1 = this.mGesture.getEventInfoAt(0).getCurrentDownEvent();
+			
 			int p1 = this.pointToPosition(
-					(int)t1.mCurrentDownEvent.getX(), 
-					(int)t1.mCurrentDownEvent.getY());
+					(int)m1.getX(), 
+					(int)m1.getY());
 			Log.v(TAG, "First touch Position: " + p1);
 			int p2 = this.pointToPosition((int)e.getX(), (int)e.getY());
 			if(p1 == INVALID_POSITION){
@@ -451,12 +450,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	@Override
 	public boolean onSingleTapUp(MultiMotionEvent e) {
 		// TODO Auto-generated method stub
-		TouchEvent touch = touchEvents.get(e.getId());
-		if(touch == null){
+		EventInfo event1 = this.mGesture.getEventInfoAt(0);
+		if(event1 == null){
 			return false;
 		}
-		touch.isLongPress = false;
-		this.removeEventFromList(e.getId());
 		Log.v(TAG, "onSingleTapUp ");
 		switch(this.status){
 		case HANDLE_NOTHING:
@@ -547,12 +544,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			float velocityY) {
 		// TODO Auto-generated method stub
 		Log.v(TAG, "onFling " + e2.getX() + " " + e2.getY());
-		TouchEvent touch = touchEvents.get(e1.getId());
-		if(touch == null){
+		EventInfo event1 = this.mGesture.getEventInfoAt(0);
+		if(event1 == null){
 			return false;
 		}
-		touch.isLongPress = false;
-		this.removeEventFromList(e1.getId());
 		switch(this.status){
 		case HANDLE_NOTHING:
 			break;
@@ -702,11 +697,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	@Override
 	public void onLongPress(MultiMotionEvent e) {
 		// TODO Auto-generated method stub
-		TouchEvent touch = touchEvents.get(e.getId());
-		if(touch == null){
+		EventInfo event1 = this.mGesture.getEventInfoAt(0);
+		if(event1 == null){
 			return ;
 		}
-		touch.isLongPress = true;
 		if(this.status != HANDLE_NOTHING){
 			return ;
 		}
@@ -784,59 +778,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		// TODO Auto-generated method stub
 		return this.mGesture.onTouchEvent(event);
 	}
-	
-	private class TouchEvent{
-        private MultiMotionEvent mCurrentDownEvent;
-        private boolean isLongPress;
-        
-        private TouchEvent(MultiMotionEvent me) {  
-            mCurrentDownEvent = me;
-            isLongPress = false;
-        }
-	}
-	
-	/** 
-     * 从事件信息队列中移除指定序号的事件 
-     *  
-     * @param idx 
-     */  
-    private void removeEventFromList(int id) {  
-        if (id > touchEvents.size() || id < 0) {  
-            // Log.e(MYTAG, CLASS_NAME + ".removeEventFromList(), id=" + id + ", while sEventInfos.size() =" +  
-            // sEventInfos.size());  
-            return;  
-        }  
-        touchEvents.set(id, null);  
-    }  
-  
-    /** 
-     * 向事件队列中添加新信息 
-     *  
-     * @param e 
-     */  
-    private void addEventtoList(TouchEvent info) {  
-        int id = info.mCurrentDownEvent.getId();  
-        if (id < touchEvents.size()) {  
-            // if (sEventInfos.get(id) != null)  
-            // Log.e(MYTAG, CLASS_NAME + ".addEventIntoList, info(" + id + ") has not set to null !");  
-        	touchEvents.set(info.mCurrentDownEvent.getId(), info);  
-        } else if (id == touchEvents.size()) {  
-        	touchEvents.add(info);  
-        } else {  
-            // Log.e(MYTAG, CLASS_NAME + ".addEventIntoList, invalidata id !");  
-        }  
-    }
-    
-    private int getFingerCount(){
-    	int count = 0;
-    	for(int i=0;i<this.touchEvents.size();i++){
-    		if(this.touchEvents.get(i) != null){
-    			count +=1;
-    		}
-    	}
-    	return count;
-    }
-    
+
     private Bitmap roateImageView(Bitmap bitmap, float x, float y, float z){
     	float angle = (float) (Math.acos(y / bitmap.getHeight())*(180/Math.PI));
     	Camera camera = new Camera();
