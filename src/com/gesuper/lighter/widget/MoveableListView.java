@@ -1,10 +1,8 @@
 package com.gesuper.lighter.widget;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.gesuper.lighter.R;
 import com.gesuper.lighter.tools.Rotate3DAnimation;
+import com.gesuper.lighter.widget.MultiGestureDetector.EventInfo;
 import com.gesuper.lighter.widget.MultiGestureDetector.MultiMotionEvent;
 import com.gesuper.lighter.widget.MultiGestureDetector.OnMultiGestureListener;
 
@@ -14,6 +12,7 @@ import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -63,7 +62,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	private LayoutInflater mInflater;
 	protected Context context;
 	private MultiGestureDetector mGesture;
-	private List<TouchEvent> touchEvents;
 	private int belowTouch;
 	private int upTouch;
 	private ItemViewBase belowItem;
@@ -133,14 +131,15 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.itemClickedListener = null;
 		this.setSmoothScrollbarEnabled(true);
 		WindowManager wm = (WindowManager) this.context.getSystemService(Context.WINDOW_SERVICE);
-	    screenWidth = wm.getDefaultDisplay().getWidth();
-	    screenHeight = wm.getDefaultDisplay().getHeight();
+		Point p = new Point();
+	    wm.getDefaultDisplay().getSize(p);
+	    screenWidth = p.x;
+	    screenHeight = p.y; 
 	    Log.d(TAG, "width: " + screenWidth + " height: " + screenHeight);
 		//this.setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS );
 		this.mInflater = LayoutInflater.from(this.context);
 		this.mGesture = new MultiGestureDetector(this.context, this);
 		this.mGesture.setIsLongpressEnabled(true);
-		this.touchEvents = new ArrayList<TouchEvent>();
 		this.belowTouch = 0; this.upTouch = 1;
         this.status = HANDLE_NOTHING;
         
@@ -215,10 +214,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.newItemListener = listener;
 	}
 	
-	
 	public void setOnItemClickedListener(onItemClickedListener listener){
 		this.itemClickedListener = listener;
 	}
+	
 	private void updateHeadText(){
 		switch(this.headStatus){
 		case HEAD_PULL:
@@ -313,10 +312,14 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	private void startEditItem(int position) {
 		// TODO Auto-generated method stub
 		this.hideBelowItems(position);
+		InputMethodManager inputManager = 
+			(InputMethodManager)this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 		if(position == 0){		//edit head view
 			this.mHeadText.requestFocus();
+			inputManager.showSoftInput(this.mHeadText, 0);
 		} else if(position == this.getChildCount()){
 			this.mFootText.requestFocus();
+			inputManager.showSoftInput(this.mFootText, 0);
 		} else {
 			scrollItemToTop(position);
 			//this.currentItem.startEdit();
@@ -385,6 +388,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			}
 		}
 	}
+	
 	private void showBelowItems(int index){
 		int total = this.getAdapter().getCount() - this.getFooterViewsCount();;
 		for(int i = index +1 ;i < total ; i++){
@@ -395,12 +399,56 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		}
 	}
 	
+	private void startDrag(Bitmap bitmap, int y) {
+		// TODO Auto-generated method stub
+		this.stopDrag();
+		this.mWindowParams = new WindowManager.LayoutParams();
+		this.mWindowParams.gravity = Gravity.TOP | Gravity.LEFT;
+		
+		this.mWindowParams.alpha = (float) 0.5;
+		this.mWindowParams.x = mDragPointX;
+		this.mWindowParams.y = y - mDragPointY + mDragOffSetY;
+
+		this.mWindowParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+		this.mWindowParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
+		this.mWindowParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+		this.mWindowParams.format = PixelFormat.TRANSLUCENT;
+		this.mWindowParams.windowAnimations = 0;
+        
+        Context context = this.getContext();
+        ImageView v = new ImageView(context);
+        
+        v.setImageBitmap(bitmap);
+        mDragBitmap = bitmap;
+
+        mWindowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        mWindowManager.addView(v, mWindowParams);
+        mDragView = v;
+	}
+
+	private void stopDrag() {
+		// TODO Auto-generated method stub
+		if (mDragView != null) {
+            mWindowManager.removeView(mDragView);
+            mDragView.setImageDrawable(null);
+            mDragView = null;
+        }
+        if (mDragBitmap != null) {
+            mDragBitmap.recycle();
+            mDragBitmap = null;
+        }
+	}
+	
 	@Override
 	public boolean onDown(MultiMotionEvent e) {
 		// TODO Auto-generated method stub
 		Log.v(TAG, "onDown " + e.getX() + " " + e.getY() + " " + e.getId());
 		//Multi touch
-		if(this.getFingerCount() > 1 ){
+		if(this.mGesture.getFingerCount() > 1 ){
 			//clear other motions
 			//if(this.status == HANDLE_NOTHING){
 				this.status = HANDLE_MULTI;
@@ -415,7 +463,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			if(p1 == INVALID_POSITION){
 				return false;
 			} else {
-				if(t1.mCurrentDownEvent.getY() < e.getY()){
+				if(m1.getY() < e.getY()){
 					p2 = p1 + 1;
 					this.belowTouch=1;
 					this.upTouch = 0;
@@ -515,7 +563,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			this.endEditItem(this.getChildCount());
 			break;
 		case HANDLE_MULTI:
-			if(this.getFingerCount() == 0){
+			if(this.mGesture.getFingerCount() == 0){
 				this.setPadding(0, initPaddingTop, 0, 0);
 				Log.v(TAG, "no finger on screen");
 				this.status = HANDLE_NOTHING;
@@ -528,7 +576,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			} else if(e.getId() == this.belowTouch){
 				this.belowItem.setPadding(0, 0, 0, 0);
 			}
-			if(this.getFingerCount() == 0){
+			if(this.mGesture.getFingerCount() == 0){
 				this.setPadding(0, initPaddingTop, 0, 0);
 				this.createImage.setImageBitmap(null);
 				this.createImage.setPadding(0, 0, 0, 0);
@@ -576,7 +624,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			stopDrag();
 			break;
 		case HANDLE_MULTI:
-			if(this.getFingerCount() == 0){
+			if(this.mGesture.getFingerCount() == 0){
 				this.setPadding(0, initPaddingTop, 0, 0);
 				Log.v(TAG, "no finger on screen");
 				this.status = HANDLE_NOTHING;
@@ -589,7 +637,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			} else if(e1.getId() == this.belowTouch){
 				this.belowItem.setPadding(0, 0, 0, 0);
 			}
-			if(this.getFingerCount() == 0){
+			if(this.mGesture.getFingerCount() == 0){
 				this.setPadding(0, initPaddingTop, 0, 0);
 				this.createImage.setImageBitmap(null);
 				this.createImage.setPadding(0, 0, 0, 0);
@@ -652,14 +700,18 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 					this.createImage.setPadding(0, 0, 0, 0);
 				}
 				else {
-					Bitmap map = this.roateImageView(this.mFootBitmap, 0,this.mHeadHeight,0);
-					this.createImage.setImageBitmap(map);
+					this.createImage.setImageBitmap(this.mFootBitmap);
 					this.createImage.setPadding(0, 0, 0, dY - this.mHeadHeight);
 				}
 			}
 			else if(this.upTouch == e1.getId() && dY <0){
 				this.setPadding(0, this.initPaddingTop + dY, 0, 0);
 				this.upItem.setPadding(0, 0, 0, -dY);
+				if(dY<this.mHeadHeight){
+					Bitmap map = this.roateImageView(this.mFootBitmap, 0, -dY,0);
+					this.createImage.setImageBitmap(map);
+					this.createImage.setPadding(0, dY, 0, 0);
+				}
 			}
 		}
 		return false;
@@ -729,50 +781,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		startDrag(bitmap, this.mDragPointY + this.mDragItemView.getTop());
 	}
 
-	private void startDrag(Bitmap bitmap, int y) {
-		// TODO Auto-generated method stub
-		this.stopDrag();
-		this.mWindowParams = new WindowManager.LayoutParams();
-		this.mWindowParams.gravity = Gravity.TOP | Gravity.LEFT;
-		
-		this.mWindowParams.alpha = (float) 0.5;
-		this.mWindowParams.x = mDragPointX;
-		this.mWindowParams.y = y - mDragPointY + mDragOffSetY;
-
-		this.mWindowParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-		this.mWindowParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
-		this.mWindowParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-                | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-                | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
-		this.mWindowParams.format = PixelFormat.TRANSLUCENT;
-		this.mWindowParams.windowAnimations = 0;
-        
-        Context context = this.getContext();
-        ImageView v = new ImageView(context);
-        
-        v.setImageBitmap(bitmap);
-        mDragBitmap = bitmap;
-
-        mWindowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
-        mWindowManager.addView(v, mWindowParams);
-        mDragView = v;
-	}
-
-	private void stopDrag() {
-		// TODO Auto-generated method stub
-		if (mDragView != null) {
-            mWindowManager.removeView(mDragView);
-            mDragView.setImageDrawable(null);
-            mDragView = null;
-        }
-        if (mDragBitmap != null) {
-            mDragBitmap.recycle();
-            mDragBitmap = null;
-        }
-	}
-
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		// TODO Auto-generated method stub
@@ -795,7 +803,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
         camera.restore();
         // 设置图像处理的中心点
         int w = bitmap.getWidth()/2;
-        int h = bitmap.getHeight()/2;
         matrix.preTranslate(-w, 0);
         matrix.postTranslate(w, 0); 
         Bitmap newBit = null;
@@ -823,8 +830,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	}
     
     private void measureView(View child) {  
-		WindowManager wm = (WindowManager) this.context.getSystemService(Context.WINDOW_SERVICE);
-	    int screenWidth = wm.getDefaultDisplay().getWidth();
+	    int screenWidth = this.screenWidth;
 	    ViewGroup.LayoutParams p = child.getLayoutParams();  
 		if (p == null) {  
 		    p = new ViewGroup.LayoutParams(screenWidth,  

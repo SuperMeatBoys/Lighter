@@ -52,6 +52,9 @@ public class MainActivity extends Activity {
 			public void createNewItem(int position, String content) {
 				// TODO Auto-generated method stub
 				EventModel em = new EventModel(MainActivity.this, content);
+				long id = dbHelper.insert(DbHelper.TABLE.EVENTS, em.formatContentValuesWithoutId());
+				em.setId((int) id);
+				Log.v(TAG, content);
 				switch(position){
 				case OnCreateNewItemListener.CREATE_TOP:
 					mEventArray.add(0, em);
@@ -64,7 +67,6 @@ public class MainActivity extends Activity {
 					break;
 				}
 				mEventAdapter.notifyDataSetChanged();
-				dbHelper.insert(DbHelper.TABLE.EVENTS, em.formatContentValuesWithoutId());
 			}
 		});
 		this.mEventList.setOnItemClickedListener(new onItemClickedListener(){
@@ -87,11 +89,9 @@ public class MainActivity extends Activity {
 	private void getEventFromDb(){
 		this.mEventArray.clear();
 		Cursor cursor = dbHelper.query(DbHelper.TABLE.EVENTS, EventModel.mColumns, null, null, EventModel.SEQUENCE + " asc");
-		cursor.moveToFirst();
-		do{
+		while(cursor.moveToNext()){
 			this.mEventArray.add(new EventModel(this, cursor));
-			cursor.moveToNext();
-		}while(cursor.moveToNext());
+		}
 		this.mEventAdapter.notifyDataSetChanged();
 	}
 	
@@ -118,6 +118,7 @@ public class MainActivity extends Activity {
 			dbHelper.update(DbHelper.TABLE.EVENTS, model.formatContentValuesWithoutId(), 
 					EventModel.ID + " = " + model.getId(), null);
 		}
+		Log.v(TAG, "onPause" + index);
 	}
 	
 	@Override

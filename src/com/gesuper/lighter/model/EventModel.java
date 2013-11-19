@@ -65,7 +65,7 @@ public class EventModel extends ItemModelBase{
 	}
 	
 	public ContentValues formatContentValuesWithoutId(){
-		ContentValues cv = this.formatContentValuesWithoutId();
+		ContentValues cv = super.formatContentValuesWithoutId();
 		cv.put(COUNT, this.count);
 		return cv;
 	}
