@@ -69,4 +69,9 @@ public class EventModel extends ItemModelBase{
 		cv.put(COUNT, this.count);
 		return cv;
 	}
+
+	public void setCount(int c) {
+		// TODO Auto-generated method stub
+		this.count = c;
+	}
 }

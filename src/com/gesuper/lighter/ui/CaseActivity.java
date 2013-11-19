@@ -11,6 +11,7 @@ import com.gesuper.lighter.widget.MoveableListView;
 import com.gesuper.lighter.widget.MoveableListView.OnCreateNewItemListener;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 
@@ -20,6 +21,7 @@ public class CaseActivity extends Activity{
 	private ArrayList<CaseModel> mCaseArray;
 	private CaseListAdapter mCaseAdapter;
 	private DbHelper dbHelper;
+	private int mEventId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +35,8 @@ public class CaseActivity extends Activity{
 		this.mCaseList = (MoveableListView) this.findViewById(R.id.case_list);
 		this.mCaseArray = new ArrayList<CaseModel>();
 		this.dbHelper = DbHelper.getInstance(this);
-		
+		Intent intent = this.getIntent();
+		mEventId = intent.getIntExtra("EVENT_ID", -1);
 		this.mCaseAdapter = new CaseListAdapter(this, R.layout.event_item, this.mCaseArray);
 		this.mCaseList.setAdapter(mCaseAdapter);
 		this.mCaseList.setOnTouchListener(this.mCaseList);
@@ -61,12 +64,19 @@ public class CaseActivity extends Activity{
 	private void getCasesFromDb() {
 		// TODO Auto-generated method stub
 		this.mCaseArray.clear();
-		Cursor cursor = dbHelper.query(DbHelper.TABLE.CASES, CaseModel.mColumns, null, null, EventModel.SEQUENCE + " asc");
-		cursor.moveToFirst();
+		Cursor cursor = dbHelper.query(DbHelper.TABLE.CASES, CaseModel.mColumns, CaseModel.EVENT_ID + " = " + mEventId, null, EventModel.SEQUENCE + " asc");
 		while(cursor.moveToNext()){
 			this.mCaseArray.add(new CaseModel(this, cursor));
 		}
 		this.mCaseAdapter.notifyDataSetChanged();
+	}
+	
+	@Override
+	public void onBackPressed(){
+		Intent intent = new Intent(this,  MainActivity.class);
+		intent.putExtra("COUNT", this.mCaseArray.size());
+	    this.setResult(1, intent);
+	    this.finish();
 	}
 	
 	@Override

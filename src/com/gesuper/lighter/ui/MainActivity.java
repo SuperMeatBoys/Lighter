@@ -27,6 +27,7 @@ public class MainActivity extends Activity {
 	private EventListAdapter mEventAdapter;
 	private List<EventModel> mEventArray;
 	private DbHelper dbHelper;
+	private EventModel currentModel;
 	
 	public static int screenWidth;
 	public static int screenHeight;
@@ -74,7 +75,10 @@ public class MainActivity extends Activity {
 			public void onItemClicked(int position) {
 				// TODO Auto-generated method stub
 				Intent intent = new Intent(MainActivity.this, CaseActivity.class);
-				MainActivity.this.startActivity(intent);
+				currentModel = mEventArray.get(position);
+				intent.putExtra("EVENT_ID", currentModel.getId());
+				
+				MainActivity.this.startActivityForResult(intent, 1);
 			}
 		});
 		
@@ -100,6 +104,11 @@ public class MainActivity extends Activity {
 		//Inflate the menu; this adds items to the action bar if it is present.
 		//getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+		currentModel.setCount(data.getIntExtra("COUNT", -1));
 	}
 	
 	@Override
