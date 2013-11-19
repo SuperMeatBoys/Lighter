@@ -275,7 +275,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		
 		if(this.headStatus == HEAD_PULL){
 			Bitmap map = this.roateImageView(this.mHeadBitmap, 0, y, 0);
-			this.mHeadImage.setImageBitmap(map);
+			if(map != null)
+				this.mHeadImage.setImageBitmap(map);
 		}
 		this.updateHeadText();
 		this.mHeadView.setPadding(0, y - this.mHeadHeight, 0, 0);
@@ -498,11 +499,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	@Override
 	public boolean onSingleTapUp(MultiMotionEvent e) {
 		// TODO Auto-generated method stub
-		EventInfo event1 = this.mGesture.getEventInfoAt(0);
-		if(event1 == null){
-			return false;
-		}
-		Log.v(TAG, "onSingleTapUp ");
+		Log.v(TAG, "onSingleTapUp " + this.status);
 		switch(this.status){
 		case HANDLE_NOTHING:
 			int position = this.pointToPosition((int)e.getOffsetX(), (int)e.getOffsetY());
@@ -592,10 +589,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			float velocityY) {
 		// TODO Auto-generated method stub
 		Log.v(TAG, "onFling " + e2.getX() + " " + e2.getY());
-		EventInfo event1 = this.mGesture.getEventInfoAt(0);
-		if(event1 == null){
-			return false;
-		}
 		switch(this.status){
 		case HANDLE_NOTHING:
 			break;
@@ -696,8 +689,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			if(this.belowTouch == e1.getId()){
 				if(dY<this.mHeadHeight){
 					Bitmap map = this.roateImageView(this.mFootBitmap, 0,dY,0);
-					this.createImage.setImageBitmap(map);
-					this.createImage.setPadding(0, 0, 0, 0);
+					if(map != null){
+						this.createImage.setImageBitmap(map);
+						this.createImage.setPadding(0, 0, 0, 0);
+					}
 				}
 				else {
 					this.createImage.setImageBitmap(this.mFootBitmap);
@@ -706,11 +701,13 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			}
 			else if(this.upTouch == e1.getId() && dY <0){
 				this.setPadding(0, this.initPaddingTop + dY, 0, 0);
-				this.upItem.setPadding(0, 0, 0, -dY);
 				if(dY<this.mHeadHeight){
 					Bitmap map = this.roateImageView(this.mFootBitmap, 0, -dY,0);
-					this.createImage.setImageBitmap(map);
-					this.createImage.setPadding(0, dY, 0, 0);
+					if(map != null){
+						this.createImage.setImageBitmap(map);
+					}
+				}else {
+					this.upItem.setPadding(0, 0, 0, -dY);
 				}
 			}
 		}
@@ -811,6 +808,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
             newBit = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
         } catch (IllegalArgumentException iae) {
             iae.printStackTrace();
+            return null;
         }
         return newBit;
     }

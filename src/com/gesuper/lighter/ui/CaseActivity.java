@@ -34,11 +34,6 @@ public class CaseActivity extends Activity{
 		this.mCaseArray = new ArrayList<CaseModel>();
 		this.dbHelper = DbHelper.getInstance(this);
 		
-		String[] exampls = this.getResources().getStringArray(R.array.example_adapter_value);
-		for(String s : exampls){
-			CaseModel em = new CaseModel(this, s, -1);
-			this.mCaseArray.add(em);
-		}
 		this.mCaseAdapter = new CaseListAdapter(this, R.layout.event_item, this.mCaseArray);
 		this.mCaseList.setAdapter(mCaseAdapter);
 		this.mCaseList.setOnTouchListener(this.mCaseList);
@@ -68,10 +63,9 @@ public class CaseActivity extends Activity{
 		this.mCaseArray.clear();
 		Cursor cursor = dbHelper.query(DbHelper.TABLE.CASES, CaseModel.mColumns, null, null, EventModel.SEQUENCE + " asc");
 		cursor.moveToFirst();
-		do{
+		while(cursor.moveToNext()){
 			this.mCaseArray.add(new CaseModel(this, cursor));
-			cursor.moveToNext();
-		}while(cursor.moveToNext());
+		}
 		this.mCaseAdapter.notifyDataSetChanged();
 	}
 	

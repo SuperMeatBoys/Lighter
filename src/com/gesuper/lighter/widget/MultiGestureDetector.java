@@ -365,6 +365,7 @@ public class MultiGestureDetector {
                 count +=1;
             }
         }
+        Log.v(TAG, "FingerCount: " + count);
         return count;
     }
     
@@ -413,7 +414,8 @@ public class MultiGestureDetector {
                 Log.e(TAG, "ACTION_POINTER_UP, idx=" + idx + ", Info = null");  
                 break;  
             }
-            
+
+            removeEventFromList(currentUpEvent.getId());// 手指离开，则从队列中删除手势信息  
             //if (info.mInLongPress) {// 处于长按状态  
             //    mHandler.removeMessages(TAP_SINGLE, idx);// 可以无视这行代码  
             //    info.mInLongPress = false;  
@@ -449,7 +451,6 @@ public class MultiGestureDetector {
             // 移除showPress和长按消息  
             mHandler.removeMessages(SHOW_PRESS, idx);  
             mHandler.removeMessages(LONG_PRESS, idx);  
-            removeEventFromList(currentUpEvent.getId());// 手指离开，则从队列中删除手势信息  
             break;
         }
         case MotionEvent.ACTION_MOVE:{
