@@ -67,7 +67,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	private ItemViewBase belowItem;
 	private ItemViewBase upItem;
 	private int initPaddingTop;
+	private int dBelow;
+	private int dUp;
 	private int status;
+	
 	
 	//field for create new 
 	private LinearLayout mHeadView;
@@ -114,7 +117,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.context = context;
 		this.initResource();
 	}
-	
+	 
 	public MoveableListView(Context context, AttributeSet attrs, int headLayout, int footLayout){
 		super(context, attrs);
 		// TODO Auto-generated constructor stub
@@ -140,7 +143,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.mInflater = LayoutInflater.from(this.context);
 		this.mGesture = new MultiGestureDetector(this.context, this);
 		this.mGesture.setIsLongpressEnabled(true);
-		this.belowTouch = 0; this.upTouch = 1;
+		this.belowTouch = 0; this.upTouch = 1;this.dBelow = 0;this.dUp = 0;
         this.status = HANDLE_NOTHING;
         
 		//init for head view
@@ -563,6 +566,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			if(this.mGesture.getFingerCount() == 0){
 				this.setPadding(0, initPaddingTop, 0, 0);
 				Log.v(TAG, "no finger on screen");
+				this.dBelow = 0; this.dUp = 0;
 				this.status = HANDLE_NOTHING;
 			}
 			break;
@@ -577,6 +581,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.setPadding(0, initPaddingTop, 0, 0);
 				this.createImage.setImageBitmap(null);
 				this.createImage.setPadding(0, 0, 0, 0);
+				this.dBelow = 0; this.dUp = 0;
 				this.status = HANDLE_NOTHING;
 			}
 			break;
@@ -620,6 +625,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			if(this.mGesture.getFingerCount() == 0){
 				this.setPadding(0, initPaddingTop, 0, 0);
 				Log.v(TAG, "no finger on screen");
+				this.dBelow = 0; this.dUp = 0;
 				this.status = HANDLE_NOTHING;
 			}
 			break;
@@ -634,6 +640,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.setPadding(0, initPaddingTop, 0, 0);
 				this.createImage.setImageBitmap(null);
 				this.createImage.setPadding(0, 0, 0, 0);
+				this.dBelow = 0; this.dUp = 0;
 				this.status = HANDLE_NOTHING;
 			}
 			break;
@@ -687,8 +694,9 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		}
 		case HANDLE_MULTI_USE:
 			if(this.belowTouch == e1.getId()){
-				if(dY<this.mHeadHeight){
-					Bitmap map = this.roateImageView(this.mFootBitmap, 0,dY,0);
+				if(dY + this.dUp < this.mHeadHeight){
+					this.dBelow = dY;
+					Bitmap map = this.roateImageView(this.mFootBitmap, 0,this.dBelow + this.dUp,0);
 					if(map != null){
 						this.createImage.setImageBitmap(map);
 						this.createImage.setPadding(0, 0, 0, 0);
@@ -696,18 +704,20 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				}
 				else {
 					this.createImage.setImageBitmap(this.mFootBitmap);
-					this.createImage.setPadding(0, 0, 0, dY - this.mHeadHeight);
+					this.createImage.setPadding(0, 0, 0, dY - this.dBelow);
 				}
 			}
-			else if(this.upTouch == e1.getId() && dY <0){
+			else if(this.upTouch == e1.getId()){
 				this.setPadding(0, this.initPaddingTop + dY, 0, 0);
-				if(dY<this.mHeadHeight){
-					Bitmap map = this.roateImageView(this.mFootBitmap, 0, -dY,0);
+				if(this.dBelow - dY < this.mHeadHeight){
+					this.dUp = -dY;
+					Bitmap map = this.roateImageView(this.mFootBitmap, 0, this.dBelow + this.dUp,0);
 					if(map != null){
 						this.createImage.setImageBitmap(map);
+						this.createImage.setPadding(0, 0, 0, 0);
 					}
 				}else {
-					this.upItem.setPadding(0, 0, 0, -dY);
+					this.upItem.setPadding(0, 0, 0, -(this.initPaddingTop + dY + this.dUp));
 				}
 			}
 		}
