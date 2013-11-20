@@ -571,16 +571,22 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			}
 			break;
 		case HANDLE_MULTI_USE:
+			EventInfo info = this.mGesture.getEventInfoAt(e.getId());
 			if(e.getId() == this.upTouch){
 				this.setPadding(0, 0, 0, 0);
 				this.upItem.setPadding(0, 0, 0, 0);
+				this.dUp = (int) (e.getY() - info.getCurrentDownEvent().getY()) * (-1);
 			} else if(e.getId() == this.belowTouch){
 				this.belowItem.setPadding(0, 0, 0, 0);
+				this.dBelow = (int) (e.getY() - info.getCurrentDownEvent().getY());
 			}
 			if(this.mGesture.getFingerCount() == 0){
 				this.setPadding(0, initPaddingTop, 0, 0);
 				this.createImage.setImageBitmap(null);
 				this.createImage.setPadding(0, 0, 0, 0);
+				if(this.dUp + this.dBelow > this.mHeadHeight){
+					
+				}
 				this.dBelow = 0; this.dUp = 0;
 				this.status = HANDLE_NOTHING;
 			}
@@ -633,13 +639,18 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			if(e1.getId() == this.upTouch){
 				this.setPadding(0, 0, 0, 0);
 				this.upItem.setPadding(0, 0, 0, 0);
+				this.dUp = (int) (e2.getY() - e1.getY()) * (-1);
 			} else if(e1.getId() == this.belowTouch){
 				this.belowItem.setPadding(0, 0, 0, 0);
+				this.dBelow = (int) (e2.getY() - e1.getY());
 			}
 			if(this.mGesture.getFingerCount() == 0){
 				this.setPadding(0, initPaddingTop, 0, 0);
 				this.createImage.setImageBitmap(null);
 				this.createImage.setPadding(0, 0, 0, 0);
+				if(this.dUp + this.dBelow > this.mHeadHeight){
+					
+				}
 				this.dBelow = 0; this.dUp = 0;
 				this.status = HANDLE_NOTHING;
 			}
