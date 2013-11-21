@@ -7,6 +7,7 @@ import com.gesuper.lighter.R;
 import com.gesuper.lighter.model.EventModel;
 import com.gesuper.lighter.tools.DbHelper;
 import com.gesuper.lighter.tools.EventListAdapter;
+import com.gesuper.lighter.widget.EventItemView;
 import com.gesuper.lighter.widget.MoveableListView;
 import com.gesuper.lighter.widget.MoveableListView.OnCreateNewItemListener;
 import com.gesuper.lighter.widget.MoveableListView.onItemClickedListener;
@@ -27,7 +28,7 @@ public class MainActivity extends Activity {
 	private EventListAdapter mEventAdapter;
 	private List<EventModel> mEventArray;
 	private DbHelper dbHelper;
-	private EventModel currentModel;
+	private int currentItemPosition;
 	
 	public static int screenWidth;
 	public static int screenHeight;
@@ -75,9 +76,8 @@ public class MainActivity extends Activity {
 			public void onItemClicked(int position) {
 				// TODO Auto-generated method stub
 				Intent intent = new Intent(MainActivity.this, CaseActivity.class);
-				currentModel = mEventArray.get(position);
-				intent.putExtra("EVENT_ID", currentModel.getId());
-				
+				currentItemPosition = position;
+				intent.putExtra("EVENT_ID", mEventArray.get(position - 1).getId());
 				MainActivity.this.startActivityForResult(intent, 1);
 			}
 		});
@@ -108,7 +108,11 @@ public class MainActivity extends Activity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
-		currentModel.setCount(data.getIntExtra("COUNT", -1));
+		int caseCount = data.getIntExtra("CASE_COUNT", -1);
+		if(caseCount < 0) return ;
+		mEventArray.get(this.currentItemPosition - 1).setCount(caseCount);
+		((EventItemView) this.mEventList.getChildAt(this.currentItemPosition)).updateCount(caseCount);
+		
 	}
 	
 	@Override

@@ -46,7 +46,7 @@ public class CaseModel extends ItemModelBase{
 	}
 	
 	public ContentValues formatContentValuesWithoutId(){
-		ContentValues cv = this.formatContentValuesWithoutId();
+		ContentValues cv = super.formatContentValuesWithoutId();
 		cv.put(EVENT_ID, this.eventId);
 		return cv;
 	}

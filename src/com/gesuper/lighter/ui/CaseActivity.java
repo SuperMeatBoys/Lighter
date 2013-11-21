@@ -14,8 +14,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 
 public class CaseActivity extends Activity{
+	public static String TAG = "CaseActivity";
 	
 	private MoveableListView mCaseList;
 	private ArrayList<CaseModel> mCaseArray;
@@ -44,7 +46,10 @@ public class CaseActivity extends Activity{
 			@Override
 			public void createNewItem(int position, String content) {
 				// TODO Auto-generated method stub
-				CaseModel em = new CaseModel(CaseActivity.this, content, -1);
+				CaseModel em = new CaseModel(CaseActivity.this, content, mEventId);
+				long id = dbHelper.insert(DbHelper.TABLE.CASES, em.formatContentValuesWithoutId());
+				em.setId((int) id);
+				Log.v(TAG, content);
 				switch(position){
 				case OnCreateNewItemListener.CREATE_TOP:
 					mCaseArray.add(0, em);
@@ -74,7 +79,7 @@ public class CaseActivity extends Activity{
 	@Override
 	public void onBackPressed(){
 		Intent intent = new Intent(this,  MainActivity.class);
-		intent.putExtra("COUNT", this.mCaseArray.size());
+		intent.putExtra("CASE_COUNT", this.mCaseArray.size());
 	    this.setResult(1, intent);
 	    this.finish();
 	}

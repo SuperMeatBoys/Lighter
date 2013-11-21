@@ -16,7 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class ItemViewBase extends FrameLayout {
+public class ItemViewBase extends LinearLayout {
 	public static final String TAG = "ItemViewBase";
 	private static final int NORMAL = 0;
 	private static final int FINISHED = 1;

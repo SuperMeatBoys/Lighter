@@ -575,10 +575,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			if(e.getId() == this.upTouch){
 				this.setPadding(0, 0, 0, 0);
 				this.upItem.setPadding(0, 0, 0, 0);
-				this.dUp = (int) (e.getY() - info.getCurrentDownEvent().getY()) * (-1);
+				//this.dUp = (int) (e.getY() - info.getCurrentDownEvent().getY()) * (-1);
 			} else if(e.getId() == this.belowTouch){
 				this.belowItem.setPadding(0, 0, 0, 0);
-				this.dBelow = (int) (e.getY() - info.getCurrentDownEvent().getY());
+				//this.dBelow = (int) (e.getY() - info.getCurrentDownEvent().getY());
 			}
 			if(this.mGesture.getFingerCount() == 0){
 				this.setPadding(0, initPaddingTop, 0, 0);

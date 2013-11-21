@@ -6,4 +6,5 @@
     <color name="item_count_bg">#2AFFFFFF</color>
     <color name="list_divider">#19FFFFFF</color>
     <color name="activity_bg">#FF000000</color>
+    <color name="item_linear_bg">#00FFFFFF</color>
 </resources>
