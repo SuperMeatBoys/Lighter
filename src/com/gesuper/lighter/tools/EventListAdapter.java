@@ -6,6 +6,7 @@ import com.gesuper.lighter.model.EventModel;
 import com.gesuper.lighter.widget.EventItemView;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -47,6 +48,8 @@ public class EventListAdapter extends BaseAdapter{
 
 		EventModel mItemModel = this.listItems.get(position);
 		mItemView.setModel(mItemModel);
+		Log.v(TAG, "setBgAlpha " + 255*position/this.getCount() + " " + mItemModel.getContent());
+		mItemView.setBgAlpha((255*position/this.getCount())<<24 + 0xFFFFFF);
         return mItemView;
 	}
 

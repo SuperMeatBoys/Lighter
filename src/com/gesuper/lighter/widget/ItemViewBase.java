@@ -138,5 +138,9 @@ public class ItemViewBase extends LinearLayout {
 		// TODO Auto-generated method stub
 		this.startAnimation(this.alphaAnimation);
 	}
-
+	
+	public void setBgAlpha(long i) {
+		// TODO Auto-generated method stub
+		this.mContentLinear.setBackgroundColor((int) i);
+	}
 }
