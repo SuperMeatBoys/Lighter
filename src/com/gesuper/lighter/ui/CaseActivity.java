@@ -7,6 +7,7 @@ import com.gesuper.lighter.model.CaseModel;
 import com.gesuper.lighter.model.EventModel;
 import com.gesuper.lighter.tools.CaseListAdapter;
 import com.gesuper.lighter.tools.DbHelper;
+import com.gesuper.lighter.tools.Utils;
 import com.gesuper.lighter.widget.MoveableListView;
 import com.gesuper.lighter.widget.MoveableListView.OnCreateNewItemListener;
 
@@ -24,7 +25,11 @@ public class CaseActivity extends Activity{
 	private CaseListAdapter mCaseAdapter;
 	private DbHelper dbHelper;
 	private int mEventId;
-
+	
+	private double baseH = 354, baseS = 100, baseL = 46;
+	private double spanH = 49, spanL = 14;
+	private double stepH = 7, stepL = 2;
+	private int maxColorSpan = 7;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -100,5 +105,17 @@ public class CaseActivity extends Activity{
 			dbHelper.update(DbHelper.TABLE.CASES, model.formatContentValuesWithoutId(), 
 					EventModel.ID + " = " + model.getId(), null);
 		}
+	}
+	
+
+	
+	public int calculateColor(int o){
+		int n = this.mCaseAdapter.getCount();
+		double dH = stepH, dL = stepL;
+		if (n > maxColorSpan && o != 0) {
+            dH = spanH / n;
+            dL = spanL / n;
+        }
+		return Utils.HSLToRGB(baseH + o * dH, (o == 0 ? baseS - 10 : baseS)/100, (baseL + o*dL)/100);
 	}
 }
