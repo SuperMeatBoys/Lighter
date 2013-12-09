@@ -13,11 +13,13 @@ import com.gesuper.lighter.widget.MoveableListView.OnCreateNewItemListener;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 
-public class CaseActivity extends Activity{
+public class CaseActivity extends Activity implements OnSharedPreferenceChangeListener {
 	public static String TAG = "CaseActivity";
 	
 	private MoveableListView mCaseList;
@@ -117,5 +119,14 @@ public class CaseActivity extends Activity{
             dL = spanL / n;
         }
 		return Utils.HSLToRGB(baseH + o * dH, (o == 0 ? baseS - 10 : baseS)/100, (baseL + o*dL)/100);
+	}
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+			String key) {
+		// TODO Auto-generated method stub
+		if(key.equals("****")){
+			//do someting
+		}
 	}
 }

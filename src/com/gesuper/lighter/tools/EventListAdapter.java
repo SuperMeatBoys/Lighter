@@ -3,12 +3,10 @@ package com.gesuper.lighter.tools;
 import java.util.List;
 
 import com.gesuper.lighter.model.EventModel;
-import com.gesuper.lighter.ui.CaseActivity;
 import com.gesuper.lighter.ui.MainActivity;
 import com.gesuper.lighter.widget.EventItemView;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;

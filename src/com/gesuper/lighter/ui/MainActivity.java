@@ -17,13 +17,15 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.util.Log;
 import android.view.Menu;
 import android.view.WindowManager;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnSharedPreferenceChangeListener {
 	public static final String TAG = "MainActivity";
 	private MoveableListView mEventList;
 	private EventListAdapter mEventAdapter;
@@ -154,6 +156,15 @@ public class MainActivity extends Activity {
 			dL = spanL / n;
 		}
 		return Utils.HSLToRGB(baseH + o * dH, Math.min(100, baseS + o * dS)/100, Math.min(100, baseL + o * dL)/100);
+	}
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+			String key) {
+		// TODO Auto-generated method stub
+		if(key.equals("****")){
+			//do someting
+		}
 	}
 
 }
