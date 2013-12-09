@@ -139,8 +139,8 @@ public class ItemViewBase extends LinearLayout {
 		this.startAnimation(this.alphaAnimation);
 	}
 	
-	public void setBgAlpha(long i) {
+	public void setBgColor(int color) {
 		// TODO Auto-generated method stub
-		this.mContentLinear.setBackgroundColor((int) i);
+		this.mContentLinear.setBackgroundColor( color );
 	}
 }

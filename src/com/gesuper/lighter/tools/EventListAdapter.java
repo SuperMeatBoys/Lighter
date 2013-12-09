@@ -16,6 +16,11 @@ public class EventListAdapter extends BaseAdapter{
 	
 	private List<EventModel> listItems;
 	private Context context;
+	
+	private double baseH = 212, baseS = 93, baseL = 53;
+	private double spanH = -12.5, spanS = 5, spanL = 12.5;
+	private double stepH = -2.5, stepS = 1, stepL = 2.5;
+	private int maxColorSpan = 6;
 	public EventListAdapter(Context context, int textViewResourceId, List<EventModel> objects) {
 		this.context = context;
 		this.listItems = objects;
@@ -38,6 +43,18 @@ public class EventListAdapter extends BaseAdapter{
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	
+	private int calculateColor(int o){
+		int n = this.getCount();
+		double dH = stepH, dS = stepS, dL = stepL;
+		if(n > this.maxColorSpan){
+			dH = spanH / n;
+			dS = spanS / n;
+			dL = spanL / n;
+		}
+		return Utils.HSLToRGB(baseH + o * dH, Math.min(100, baseS + o * dS)/100, Math.min(100, baseL + o * dL)/100);
+	}
+	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent){
 		EventItemView mItemView;
@@ -49,7 +66,7 @@ public class EventListAdapter extends BaseAdapter{
 		EventModel mItemModel = this.listItems.get(position);
 		mItemView.setModel(mItemModel);
 		Log.v(TAG, "setBgAlpha " + 255*position/this.getCount() + " " + mItemModel.getContent());
-		mItemView.setBgAlpha((255*position/this.getCount())<<24 + 0xFFFFFF);
+		mItemView.setBgColor(this.calculateColor(position));
         return mItemView;
 	}
 
