@@ -14,6 +14,7 @@ import com.gesuper.lighter.widget.MoveableListView.OnCreateNewItemListener;
 import com.gesuper.lighter.widget.MoveableListView.onItemClickedListener;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -165,6 +166,24 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		if(key.equals("****")){
 			//do someting
 		}
+		
+		//从应用的任意处获得Preferences
+		SharedPreferences mPerferences = PreferenceManager  
+		        .getDefaultSharedPreferences(this);  
+
+		//从Preferences中获得一个值，如果不存在则值为null
+		String loginName = mPerferences.getString("name", null);  
+
+		if(loginName == null){
+		    Log.v("Preferences", "User not login");
+		}
+
+		//获得Editor编辑Preferences的值
+		SharedPreferences.Editor mEditor = mPerferences.edit();  
+		          
+		mEditor.putString("name", "admin");  
+		//将更新后的值提交
+		mEditor.commit();
 	}
 
 }
