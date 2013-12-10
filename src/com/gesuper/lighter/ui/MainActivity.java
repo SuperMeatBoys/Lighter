@@ -8,6 +8,7 @@ import com.gesuper.lighter.model.EventModel;
 import com.gesuper.lighter.tools.DbHelper;
 import com.gesuper.lighter.tools.EventListAdapter;
 import com.gesuper.lighter.tools.Utils;
+import com.gesuper.lighter.tools.theme.ThemeBase;
 import com.gesuper.lighter.widget.EventItemView;
 import com.gesuper.lighter.widget.MoveableListView;
 import com.gesuper.lighter.widget.MoveableListView.OnCreateNewItemListener;
@@ -34,13 +35,10 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	private DbHelper dbHelper;
 	private int currentItemPosition;
 	
+	private ThemeBase theme;
 	public static int screenWidth;
 	public static int screenHeight;
 	
-	private double baseH = 212, baseS = 93, baseL = 53;
-	private double spanH = -12.5, spanS = 5, spanL = 12.5;
-	private double stepH = -2.5, stepS = 1, stepL = 2.5;
-	private int maxColorSpan = 6;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -97,6 +95,11 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	    screenWidth = p.x;
 	    screenHeight = p.y; 
 	    Log.v(TAG, "width: " + screenWidth + " height: " + screenHeight);
+	    
+		SharedPreferences mPerferences = PreferenceManager  
+		        .getDefaultSharedPreferences(this);
+		int themeId = mPerferences.getInt("theme_id", 0);  
+		this.theme = Utils.getThemeById(themeId);
 	}
 
 	private void getEventFromDb(){
@@ -140,7 +143,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 			dbHelper.update(DbHelper.TABLE.EVENTS, model.formatContentValuesWithoutId(), 
 					EventModel.ID + " = " + model.getId(), null);
 		}
-		Log.v(TAG, "onPause" + index);
+		Log.v(TAG, "onPause " + index);
 	}
 	
 	@Override
@@ -150,13 +153,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 
 	public int calculateColor(int o){
 		int n = this.mEventAdapter.getCount();
-		double dH = stepH, dS = stepS, dL = stepL;
-		if(n > this.maxColorSpan){
-			dH = spanH / n;
-			dS = spanS / n;
-			dL = spanL / n;
-		}
-		return Utils.HSLToRGB(baseH + o * dH, Math.min(100, baseS + o * dS)/100, Math.min(100, baseL + o * dL)/100);
+		return theme.calculateColor(n, o);
 	}
 
 	@Override

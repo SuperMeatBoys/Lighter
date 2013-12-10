@@ -5,13 +5,16 @@ import java.util.ArrayList;
 import com.gesuper.lighter.R;
 import com.gesuper.lighter.model.CaseModel;
 import com.gesuper.lighter.model.EventModel;
+import com.gesuper.lighter.model.ItemModelBase;
 import com.gesuper.lighter.tools.CaseListAdapter;
 import com.gesuper.lighter.tools.DbHelper;
 import com.gesuper.lighter.tools.Utils;
+import com.gesuper.lighter.tools.theme.ThemeBase;
 import com.gesuper.lighter.widget.MoveableListView;
 import com.gesuper.lighter.widget.MoveableListView.OnCreateNewItemListener;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -28,10 +31,7 @@ public class CaseActivity extends Activity implements OnSharedPreferenceChangeLi
 	private DbHelper dbHelper;
 	private int mEventId;
 	
-	private double baseH = 354, baseS = 100, baseL = 46;
-	private double spanH = 49, spanL = 14;
-	private double stepH = 7, stepL = 2;
-	private int maxColorSpan = 7;
+	private ThemeBase theme;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -71,6 +71,8 @@ public class CaseActivity extends Activity implements OnSharedPreferenceChangeLi
 				mCaseAdapter.notifyDataSetChanged();
 			}
 		});
+		
+		this.theme = Utils.getThemeById(2);
 	}
 
 	private void getCasesFromDb() {
@@ -107,18 +109,15 @@ public class CaseActivity extends Activity implements OnSharedPreferenceChangeLi
 			dbHelper.update(DbHelper.TABLE.CASES, model.formatContentValuesWithoutId(), 
 					EventModel.ID + " = " + model.getId(), null);
 		}
+		
+		ContentValues cv = new ContentValues();
+		cv.put(EventModel.COUNT, this.mCaseAdapter.getCount());
+		dbHelper.update(DbHelper.TABLE.EVENTS, cv, ItemModelBase.ID + "=" + this.mEventId, null);
 	}
-	
-
 	
 	public int calculateColor(int o){
 		int n = this.mCaseAdapter.getCount();
-		double dH = stepH, dL = stepL;
-		if (n > maxColorSpan && o != 0) {
-            dH = spanH / n;
-            dL = spanL / n;
-        }
-		return Utils.HSLToRGB(baseH + o * dH, (o == 0 ? baseS - 10 : baseS)/100, (baseL + o*dL)/100);
+		return this.theme.calculateColor(n, o);
 	}
 
 	@Override

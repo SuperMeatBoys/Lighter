@@ -1,0 +1,121 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:orientation="vertical"
+    tools:context=".Main" >
+
+    <FrameLayout
+        android:id="@+id/set_evnet_linear_bg"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        android:background="@drawable/event_bg">
+        <LinearLayout
+            android:id="@+id/set_evnet_linear"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
+            android:background="@color/item_linear_bg"
+            android:orientation="horizontal" >
+        
+            <TextView
+                android:id="@+id/set_evnet_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:singleLine="true"
+                android:text="@string/set_my_event"
+                android:textColor="@color/text_color"
+                android:textSize="@dimen/item_text_size"
+                android:textStyle="bold"
+                android:visibility="visible"
+                android:layout_weight="10"
+                android:paddingBottom="@dimen/item_padding"
+                android:paddingTop="@dimen/item_padding"
+                android:paddingLeft="@dimen/item_padding" />
+        
+            <TextView
+                android:id="@+id/set_event_count"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:background="@color/item_count_bg"
+                android:gravity="center"
+                android:padding="@dimen/item_padding"
+                android:text="@string/event_count"
+                android:textSize="@dimen/item_text_size"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        android:background="@drawable/event_bg">
+	    <TextView
+	        android:id="@+id/set_themes"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:background="@null"
+	        android:text="@string/set_themes" 
+            android:textColor="@color/text_color"
+            android:textSize="@dimen/item_text_size"
+            android:textStyle="bold"
+            android:paddingBottom="@dimen/item_padding"
+            android:paddingTop="@dimen/item_padding"
+            android:paddingLeft="@dimen/item_padding"/>
+    
+    </FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        android:background="@drawable/event_bg">
+        <TextView
+            android:id="@+id/set_author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:text="@string/set_author" 
+            android:textColor="@color/text_color"
+            android:textSize="@dimen/item_text_size"
+            android:textStyle="bold"
+            android:paddingBottom="@dimen/item_padding"
+            android:paddingTop="@dimen/item_padding"
+            android:paddingLeft="@dimen/item_padding"/>
+    
+    </FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        android:background="@drawable/event_bg">
+        <TextView
+            android:id="@+id/set_abouts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:text="@string/set_abouts" 
+            android:textColor="@color/text_color"
+            android:textSize="@dimen/item_text_size"
+            android:textStyle="bold"
+            android:paddingBottom="@dimen/item_padding"
+            android:paddingTop="@dimen/item_padding"
+            android:paddingLeft="@dimen/item_padding"/>
+    
+    </FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        android:background="@drawable/event_bg">
+        <TextView
+            android:id="@+id/set_donate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:text="@string/set_donate" 
+            android:textColor="@color/text_color"
+            android:textSize="@dimen/item_text_size"
+            android:textStyle="bold"
+            android:paddingBottom="@dimen/item_padding"
+            android:paddingTop="@dimen/item_padding"
+            android:paddingLeft="@dimen/item_padding"/>
+    
+    </FrameLayout>
+</LinearLayout>

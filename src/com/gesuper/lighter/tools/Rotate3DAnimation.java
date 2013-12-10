@@ -10,21 +10,13 @@ public class Rotate3DAnimation extends Animation {
 	private final float mToDegrees; 
 	// 中心点 
 	private final float mCenterX; 
-	private final float mCenterY; 
-	private final float mDepthZ; 
-	// 是否需要扭曲 
-	private final boolean mReverse; 
 	// 摄像头 
 	private Camera mCamera; 
 	
-	public Rotate3DAnimation(float fromDegrees, float toDegrees, float centerX, 
-			float centerY, float depthZ, boolean reverse) { 
+	public Rotate3DAnimation(float fromDegrees, float toDegrees, float centerX) { 
 		mFromDegrees = fromDegrees; 
 		mToDegrees = toDegrees; 
 		mCenterX = centerX; 
-		mCenterY = centerY; 
-		mDepthZ = depthZ; 
-		mReverse = reverse; 
 	}
 	
 	@Override 
@@ -41,7 +33,6 @@ public class Rotate3DAnimation extends Animation {
 		// 生成中间角度 
 		float degrees = fromDegrees + ((mToDegrees - fromDegrees) * interpolatedTime); 
 		final float centerX = mCenterX; 
-		final float centerY = mCenterY; 
 		final Camera camera = mCamera; 
 		final Matrix matrix = t.getMatrix(); 
 		camera.save();

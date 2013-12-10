@@ -13,6 +13,8 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -69,6 +71,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	private int initPaddingTop;
 	private int dBelow;
 	private int dUp;
+	private boolean isNeedCreateMiddleItem;
 	private int status;
 	
 	
@@ -111,6 +114,12 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 
 	private OnCreateNewItemListener newItemListener;
 	private onItemClickedListener itemClickedListener;
+	private Handler startEditItemHandler = new Handler(){
+		public void handleMessage(Message message){
+			MoveableListView.this.startEditItem(message.what);
+		}
+	};
+	
 	public MoveableListView(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
@@ -127,7 +136,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.initResource();
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void initResource() {
 		// TODO Auto-generated method stub
 		this.newItemListener = null;
@@ -144,6 +152,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.mGesture = new MultiGestureDetector(this.context, this);
 		this.mGesture.setIsLongpressEnabled(true);
 		this.belowTouch = 0; this.upTouch = 1;this.dBelow = 0;this.dUp = 0;
+		this.isNeedCreateMiddleItem = false;
         this.status = HANDLE_NOTHING;
         
 		//init for head view
@@ -196,7 +205,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			public void onAnimationRepeat(Animation arg0) {}
 			public void onAnimationStart(Animation arg0) {}
 		});
-		this.rotate3dAnimation = new Rotate3DAnimation(-90,0, this.mFootBitmap.getWidth()/2, this.mFootBitmap.getHeight()/2, 0, false);
+		this.rotate3dAnimation = new Rotate3DAnimation(-90,0, this.mFootBitmap.getWidth()/2);
 		this.rotate3dAnimation.setDuration(500L);
 		this.rotate3dAnimation.setAnimationListener(new AnimationListener(){
 			@Override
@@ -313,7 +322,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		v.setLayoutParams(p);
 	}
 	
-	private void startEditItem(int position) {
+	public void startEditItem(int position) {
 		// TODO Auto-generated method stub
 		this.hideBelowItems(position);
 		InputMethodManager inputManager = 
@@ -571,21 +580,20 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			}
 			break;
 		case HANDLE_MULTI_USE:
-			EventInfo info = this.mGesture.getEventInfoAt(e.getId());
 			if(e.getId() == this.upTouch){
 				this.setPadding(0, 0, 0, 0);
 				this.upItem.setPadding(0, 0, 0, 0);
-				//this.dUp = (int) (e.getY() - info.getCurrentDownEvent().getY()) * (-1);
 			} else if(e.getId() == this.belowTouch){
 				this.belowItem.setPadding(0, 0, 0, 0);
-				//this.dBelow = (int) (e.getY() - info.getCurrentDownEvent().getY());
 			}
 			if(this.mGesture.getFingerCount() == 0){
 				this.setPadding(0, initPaddingTop, 0, 0);
 				this.createImage.setImageBitmap(null);
 				this.createImage.setPadding(0, 0, 0, 0);
-				if(this.dUp + this.dBelow > this.mHeadHeight){
-					
+				if(this.isNeedCreateMiddleItem){
+					int p = this.getPositionForView(belowItem);
+					this.newItemListener.createNewItem(p, "");
+					this.startEditItemHandler.sendEmptyMessageDelayed(p, 300);
 				}
 				this.dBelow = 0; this.dUp = 0;
 				this.status = HANDLE_NOTHING;
@@ -648,8 +656,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.setPadding(0, initPaddingTop, 0, 0);
 				this.createImage.setImageBitmap(null);
 				this.createImage.setPadding(0, 0, 0, 0);
-				if(this.dUp + this.dBelow > this.mHeadHeight){
-					
+				if(this.isNeedCreateMiddleItem){
+					int p = this.getPositionForView(belowItem);
+					this.newItemListener.createNewItem(p, "");
+					this.startEditItemHandler.sendEmptyMessageDelayed(p, 300);
 				}
 				this.dBelow = 0; this.dUp = 0;
 				this.status = HANDLE_NOTHING;
@@ -706,6 +716,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		case HANDLE_MULTI_USE:
 			if(this.belowTouch == e1.getId()){
 				if(dY + this.dUp < this.mHeadHeight){
+					this.isNeedCreateMiddleItem = false;
 					this.dBelow = dY;
 					Bitmap map = this.roateImageView(this.mFootBitmap, 0,this.dBelow + this.dUp,0);
 					if(map != null){
@@ -714,6 +725,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 					}
 				}
 				else {
+					this.isNeedCreateMiddleItem = true;
 					this.createImage.setImageBitmap(this.mFootBitmap);
 					this.createImage.setPadding(0, 0, 0, dY - this.dBelow);
 				}
@@ -721,13 +733,15 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			else if(this.upTouch == e1.getId()){
 				this.setPadding(0, this.initPaddingTop + dY, 0, 0);
 				if(this.dBelow - dY < this.mHeadHeight){
-					this.dUp = -dY;
+					this.isNeedCreateMiddleItem = false;
+					this.dUp = - dY;
 					Bitmap map = this.roateImageView(this.mFootBitmap, 0, this.dBelow + this.dUp,0);
 					if(map != null){
 						this.createImage.setImageBitmap(map);
 						this.createImage.setPadding(0, 0, 0, 0);
 					}
 				}else {
+					this.isNeedCreateMiddleItem = true;
 					this.upItem.setPadding(0, 0, 0, -(this.initPaddingTop + dY + this.dUp));
 				}
 			}

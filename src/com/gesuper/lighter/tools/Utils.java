@@ -1,5 +1,11 @@
 package com.gesuper.lighter.tools;
 
+import com.gesuper.lighter.tools.DbHelper.TABLE;
+import com.gesuper.lighter.tools.theme.*;
+
+import android.content.Context;
+import android.database.Cursor;
+
 public class Utils {
 	
 	//change color from hsl to rgb
@@ -34,5 +40,27 @@ public class Utils {
 	    if (2.0 * vH < 1) return v2;
 	    if (3.0 * vH < 2) return v1 + (v2 - v1) * ((2.0 / 3.0) - vH) * 6.0;
 	    return (v1);
+	}
+
+	public static int getEventCount(Context context) {
+		// TODO Auto-generated method stub
+		DbHelper dbHelper = DbHelper.getInstance(context);
+		Cursor cursor = dbHelper.query(TABLE.EVENTS, null, null, null, null);
+		return cursor.getCount();
+	}
+
+	public static ThemeBase getThemeById(int themeId) {
+		// TODO Auto-generated method stub
+		switch(themeId){
+		case ThemeBase.GRAY:
+			return new GreyTheme();
+		case ThemeBase.RED:
+			return new RedTheme();
+		case ThemeBase.GREEN:
+			return new GreenTheme();
+		case ThemeBase.BLUE:
+		default:
+			return new BlueTheme();
+		}
 	}
 }

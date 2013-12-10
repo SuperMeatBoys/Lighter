@@ -17,4 +17,10 @@
 	<string name="case_switch_list">Switch to List</string>
 	<string name="case_pull_create">Pull to Create Item</string>
 	<string name="case_release_create">Release to Create Item</string>
+	
+    <string name="set_my_event">My Events</string>
+    <string name="set_themes">Themes</string>
+    <string name="set_author">Author</string>
+    <string name="set_abouts">About app</string>
+    <string name="set_donate">Donate</string>
 </resources>
