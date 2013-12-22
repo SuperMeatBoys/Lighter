@@ -34,7 +34,8 @@
 	        android:id="@+id/item_linear_bg"
             android:layout_width="match_parent"
             android:layout_height="@dimen/item_height"
-            android:background="@drawable/event_bg">
+            android:background="@drawable/event_bg"
+            android:paddingBottom="1dp">
 		    <LinearLayout
 		        android:id="@+id/item_linear"
 		        android:layout_width="match_parent"

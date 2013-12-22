@@ -4,7 +4,7 @@
     <color name="item_event_bg">#FF1780F7</color>
     <color name="item_case_bg">#FFEB0017</color>
     <color name="item_count_bg">#2AFFFFFF</color>
-    <color name="list_divider">#19FFFFFF</color>
+    <color name="list_divider">#49FFFFFF</color>
     <color name="activity_bg">#FF000000</color>
     <color name="item_linear_bg">#00FFFFFF</color>
 </resources>

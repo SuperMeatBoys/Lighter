@@ -3,7 +3,36 @@
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
 	android:orientation="vertical">
-    
+	<ImageView
+	    android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/activity_switch_view"
+		android:contentDescription="@string/hello_world">
+	</ImageView>
+	<LinearLayout
+		android:id="@+id/item_head_switch"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/item_height"
+		android:orientation="horizontal"
+		android:gravity="center"
+		android:background="@color/activity_bg"
+		android:visibility="gone">
+		<ImageView 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/item_head_switch_bitmap"
+			android:contentDescription="@string/hello_world"
+			android:src="@drawable/arrow"/>
+		<TextView 
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_gravity="center"
+			android:text="@string/case_switch_list"
+			android:textSize="@dimen/item_text_size"
+			android:paddingTop="@dimen/item_padding"
+			android:paddingBottom="@dimen/item_padding"
+			android:textStyle="bold"/>
+	</LinearLayout>
 	<LinearLayout
 	    android:layout_width="match_parent"
 		android:layout_height="@dimen/item_height"

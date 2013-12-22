@@ -51,7 +51,6 @@ public class EventListAdapter extends BaseAdapter{
 
 		EventModel mItemModel = this.listItems.get(position);
 		mItemView.setModel(mItemModel);
-		Log.v(TAG, "" + ((MainActivity) this.context).calculateColor(position));
 		mItemView.setBgColor(((MainActivity) this.context).calculateColor(position));
         return mItemView;
 	}

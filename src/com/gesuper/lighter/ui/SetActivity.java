@@ -1,6 +1,7 @@
 package com.gesuper.lighter.ui;
 
 import com.gesuper.lighter.R;
+import com.gesuper.lighter.tools.ActivityHelper;
 import com.gesuper.lighter.tools.Utils;
 
 import android.app.Activity;
@@ -22,6 +23,7 @@ public class SetActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState){
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
+		ActivityHelper.getInstance().setSetting(this);
 		
 		this.setContentView(R.layout.activity_set);
 		this.initResource();

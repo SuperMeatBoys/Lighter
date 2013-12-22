@@ -5,9 +5,7 @@ import java.util.List;
 
 import com.gesuper.lighter.R;
 import com.gesuper.lighter.model.EventModel;
-import com.gesuper.lighter.tools.DbHelper;
-import com.gesuper.lighter.tools.EventListAdapter;
-import com.gesuper.lighter.tools.Utils;
+import com.gesuper.lighter.tools.*;
 import com.gesuper.lighter.tools.theme.ThemeBase;
 import com.gesuper.lighter.widget.EventItemView;
 import com.gesuper.lighter.widget.MoveableListView;
@@ -25,6 +23,7 @@ import android.database.Cursor;
 import android.graphics.Point;
 import android.util.Log;
 import android.view.Menu;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 
 public class MainActivity extends Activity implements OnSharedPreferenceChangeListener {
@@ -43,6 +42,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		ActivityHelper.getInstance().setMain(this);
 		this.initResource();
 	}
 
@@ -85,6 +85,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 				Intent intent = new Intent(MainActivity.this, CaseActivity.class);
 				currentItemPosition = position;
 				intent.putExtra("EVENT_ID", mEventArray.get(position - 1).getId());
+				overridePendingTransition(R.anim.slide_right_in, R.anim.slide_left_out);
 				MainActivity.this.startActivityForResult(intent, 1);
 			}
 		});
@@ -102,6 +103,10 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		this.theme = Utils.getThemeById(themeId);
 	}
 
+	public ViewGroup getLayoutView(){
+		return this.mEventList;
+	}
+	
 	private void getEventFromDb(){
 		this.mEventArray.clear();
 		Cursor cursor = dbHelper.query(DbHelper.TABLE.EVENTS, EventModel.mColumns, null, null, EventModel.SEQUENCE + " asc");
@@ -183,4 +188,5 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		mEditor.commit();
 	}
 
+	
 }

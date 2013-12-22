@@ -19,6 +19,7 @@ public class EventItemView extends ItemViewBase{
 	
 	public void setModel(EventModel mItemModel) {
 		super.setModel(mItemModel);
+		this.mEventCount.setText(String.valueOf(mItemModel.getCount()));
 	}
 	
 	public void updateCount(int caseCount){

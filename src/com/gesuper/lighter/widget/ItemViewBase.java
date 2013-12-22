@@ -4,6 +4,7 @@ import com.gesuper.lighter.R;
 import com.gesuper.lighter.model.ItemModelBase;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
@@ -31,6 +32,7 @@ public class ItemViewBase extends LinearLayout {
 	
 	public ItemViewBase(Context context){
 		super(context);
+		this.initResource();
 	}
 	
 	public ItemViewBase(Context context, int layoutId) {

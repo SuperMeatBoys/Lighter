@@ -74,4 +74,8 @@ public class EventModel extends ItemModelBase{
 		// TODO Auto-generated method stub
 		this.count = c;
 	}
+	
+	public int getCount(){
+		return this.count;
+	}
 }
