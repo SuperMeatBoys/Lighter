@@ -5,12 +5,14 @@ import com.gesuper.lighter.tools.theme.*;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 public class Utils {
 	
 	//change color from hsl to rgb
 	public static int HSLToRGB(double h, double s, double l){
 		double R,G,B;
+		Log.v("Utils", h + " " + s + " " + l);
 	    double var_1, var_2;
 	    if (s == 0)                       //HSL values = 0 ÷ 1
 	    {
@@ -25,10 +27,11 @@ public class Utils {
 
 	        var_1 = 2.0 * l - var_2;
 
-	        R = 255.0 * Hue2RGB(var_1, var_2, h + (1.0 / 3.0));
-	        G = 255.0 * Hue2RGB(var_1, var_2, h);
-	        B = 255.0 * Hue2RGB(var_1, var_2, h - (1.0 / 3.0));
+	        R = 255.0 * Hue2RGB(var_1, var_2, h/255 + (1.0 / 3.0));
+	        G = 255.0 * Hue2RGB(var_1, var_2, h/255);
+	        B = 255.0 * Hue2RGB(var_1, var_2, h/255 - (1.0 / 3.0));
 	    }
+	    Log.v("Utils", R + " " + G + " " + B);
 		return (int) ((((int)R)<<16) + (((int)G)<<8) + B);
 	}
 	

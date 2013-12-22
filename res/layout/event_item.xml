@@ -39,7 +39,6 @@
 		        android:id="@+id/item_linear"
 		        android:layout_width="match_parent"
 		        android:layout_height="@dimen/item_height"
-		        android:background="@color/item_linear_bg"
 		        android:orientation="horizontal" >
 		
 				<LinearLayout 

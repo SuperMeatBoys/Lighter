@@ -7,6 +7,7 @@ import com.gesuper.lighter.ui.MainActivity;
 import com.gesuper.lighter.widget.EventItemView;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -50,6 +51,7 @@ public class EventListAdapter extends BaseAdapter{
 
 		EventModel mItemModel = this.listItems.get(position);
 		mItemView.setModel(mItemModel);
+		Log.v(TAG, "" + ((MainActivity) this.context).calculateColor(position));
 		mItemView.setBgColor(((MainActivity) this.context).calculateColor(position));
         return mItemView;
 	}
