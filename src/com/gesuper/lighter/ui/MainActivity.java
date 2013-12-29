@@ -8,9 +8,12 @@ import com.gesuper.lighter.model.EventModel;
 import com.gesuper.lighter.tools.*;
 import com.gesuper.lighter.tools.theme.ThemeBase;
 import com.gesuper.lighter.widget.EventItemView;
+import com.gesuper.lighter.widget.ItemViewBase;
 import com.gesuper.lighter.widget.MoveableListView;
 import com.gesuper.lighter.widget.MoveableListView.OnCreateNewItemListener;
+import com.gesuper.lighter.widget.MoveableListView.OnDeleteItemListener;
 import com.gesuper.lighter.widget.MoveableListView.onItemClickedListener;
+import com.umeng.analytics.MobclickAgent;
 
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -44,10 +47,13 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		setContentView(R.layout.activity_main);
 		ActivityHelper.getInstance().setMain(this);
 		this.initResource();
+		Log.v(TAG, Utils.getDeviceInfo(this));
 	}
 
 	private void initResource() {
 		// TODO Auto-generated method stub
+		MobclickAgent.setDebugMode( true );
+		
 		this.mEventList = (MoveableListView) this.findViewById(R.id.event_list);
 		this.mEventArray = new ArrayList<EventModel>();
 		
@@ -78,6 +84,13 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 				mEventAdapter.notifyDataSetChanged();
 			}
 		});
+		this.mEventList.setOnDeleteItemListener(new OnDeleteItemListener(){
+			@Override
+			public void deleteItem(ItemViewBase item) {
+				// TODO Auto-generated method stub
+				deleteEvent(item);
+			}
+		});
 		this.mEventList.setOnItemClickedListener(new onItemClickedListener(){
 			@Override
 			public void onItemClicked(int position) {
@@ -89,6 +102,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 				MainActivity.this.startActivityForResult(intent, 1);
 			}
 		});
+		
 		
 		WindowManager wm = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
 		Point p = new Point();
@@ -136,6 +150,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	protected void onResume(){
 		super.onResume();
 		this.getEventFromDb();
+		MobclickAgent.onResume(this);
 	}
 	
 	@Override
@@ -148,7 +163,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 			dbHelper.update(DbHelper.TABLE.EVENTS, model.formatContentValuesWithoutId(), 
 					EventModel.ID + " = " + model.getId(), null);
 		}
-		Log.v(TAG, "onPause " + index);
+		MobclickAgent.onPause(this);
 	}
 	
 	@Override
@@ -159,6 +174,13 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	public int calculateColor(int o){
 		int n = this.mEventAdapter.getCount();
 		return theme.calculateColor(n, o);
+	}
+	
+	public void deleteEvent(ItemViewBase item){
+		int itemId = item.getModel().getId();
+		this.mEventArray.remove(item);
+		this.mEventAdapter.notifyDataSetChanged();
+		Utils.deleteCasesByEventId(this, itemId);
 	}
 
 	@Override

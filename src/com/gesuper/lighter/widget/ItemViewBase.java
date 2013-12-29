@@ -3,6 +3,7 @@ package com.gesuper.lighter.widget;
 import com.gesuper.lighter.R;
 import com.gesuper.lighter.model.ItemModelBase;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -116,19 +117,6 @@ public class ItemViewBase extends LinearLayout {
 		// TODO Auto-generated method stub
 		return this.mContentLinear;
 	}
-	
-	public void finishItem() {
-		// TODO Auto-generated method stub
-		if(this.status == NORMAL){
-			this.mContentTv.getPaint().setFlags(Paint. STRIKE_THRU_TEXT_FLAG );
-			this.mContentLinear.setBackgroundResource(R.color.activity_bg);
-			this.status = FINISHED;
-		} else {
-			this.mContentTv.getPaint().setFlags(Paint.LINEAR_TEXT_FLAG);
-			this.mContentLinear.setBackgroundResource(R.drawable.event_bg);
-			this.status = NORMAL;
-		}
-	}
 
 	public void noneAlpha() {
 		// TODO Auto-generated method stub
@@ -143,5 +131,18 @@ public class ItemViewBase extends LinearLayout {
 	public void setBgColor(int color) {
 		// TODO Auto-generated method stub
 		this.mContentLinear.setBackgroundColor( color );
+	}
+	
+	public void finishItem() {
+		// TODO Auto-generated method stub
+		if(this.status == NORMAL){
+			this.mContentTv.getPaint().setFlags(Paint. STRIKE_THRU_TEXT_FLAG );
+			this.mContentLinear.setBackgroundResource(R.color.activity_bg);
+			this.status = FINISHED;
+		} else {
+			this.mContentTv.getPaint().setFlags(Paint.LINEAR_TEXT_FLAG);
+			this.mContentLinear.setBackgroundResource(R.drawable.event_bg);
+			this.status = NORMAL;
+		}
 	}
 }

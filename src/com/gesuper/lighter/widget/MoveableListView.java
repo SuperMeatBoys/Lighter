@@ -5,14 +5,15 @@ import com.gesuper.lighter.tools.ActivityHelper;
 import com.gesuper.lighter.tools.Rotate3DAnimation;
 import com.gesuper.lighter.tools.SwitchAnimation;
 import com.gesuper.lighter.tools.Utils;
-import com.gesuper.lighter.ui.MainActivity;
 import com.gesuper.lighter.ui.CaseActivity;
 import com.gesuper.lighter.widget.MultiGestureDetector.EventInfo;
 import com.gesuper.lighter.widget.MultiGestureDetector.MultiMotionEvent;
 import com.gesuper.lighter.widget.MultiGestureDetector.OnMultiGestureListener;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Camera;
 import android.graphics.Matrix;
@@ -123,6 +124,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 
 	private OnCreateNewItemListener newItemListener;
 	private onItemClickedListener itemClickedListener;
+	private OnDeleteItemListener deleteItemListener;
 	private Handler startEditItemHandler = new Handler(){
 		public void handleMessage(Message message){
 			MoveableListView.this.startEditItem(message.what);
@@ -239,6 +241,12 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	
 	public void setOnItemClickedListener(onItemClickedListener listener){
 		this.itemClickedListener = listener;
+	}
+
+	public void setOnDeleteItemListener(
+			OnDeleteItemListener listener) {
+		// TODO Auto-generated method stub
+		this.deleteItemListener = listener;
 	}
 	
 	private void updateHeadText(){
@@ -613,7 +621,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 							this.mHeadHeight, this.getHeight() - this.mSwitchHeight);
 					animation.setDuration(500);
 					animation.setAnimationListener(new AnimationListener(){
-
 						@Override
 						public void onAnimationStart(Animation animation) {}
 						@Override
@@ -623,7 +630,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 						}
 						@Override
 						public void onAnimationRepeat(Animation animation) {}
-						
 					});
 					this.startAnimation(animation);
 			} else {
@@ -634,6 +640,21 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		case HANDLE_ITEM_MOVE:
 			if(this.itemStatus == ITEM_FINISH){
 				this.currentItem.finishItem();
+			} else if(this.itemStatus == ITEM_DELETE){
+				new AlertDialog.Builder(this.context)   
+				.setTitle(R.string.alert_delete_event_title)
+				.setMessage(R.string.alert_delete_event_message)  
+				.setPositiveButton(R.string.alert_yes, new DialogInterface.OnClickListener(){
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						if(deleteItemListener != null){
+							deleteItemListener.deleteItem(currentItem);
+						}
+					}
+				})  
+				.setNegativeButton(R.string.alert_no, null)  
+				.show();  
 			}
 			this.updateItemStatus(0);
 			this.status = HANDLE_NOTHING;
@@ -953,6 +974,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		public static final int CREATE_TOP = -1;
 		public static final int CREATE_BOTTOM = -2;
 		public void createNewItem(int position, String content);
+	}
+	
+	public interface OnDeleteItemListener{
+		public void deleteItem(ItemViewBase item);
 	}
 	
 	public interface onItemClickedListener {

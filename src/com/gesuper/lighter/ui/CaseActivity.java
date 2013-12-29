@@ -10,8 +10,11 @@ import com.gesuper.lighter.tools.CaseListAdapter;
 import com.gesuper.lighter.tools.DbHelper;
 import com.gesuper.lighter.tools.Utils;
 import com.gesuper.lighter.tools.theme.ThemeBase;
+import com.gesuper.lighter.widget.ItemViewBase;
 import com.gesuper.lighter.widget.MoveableListView;
 import com.gesuper.lighter.widget.MoveableListView.OnCreateNewItemListener;
+import com.gesuper.lighter.widget.MoveableListView.OnDeleteItemListener;
+import com.umeng.analytics.MobclickAgent;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -73,7 +76,14 @@ public class CaseActivity extends Activity implements OnSharedPreferenceChangeLi
 				mCaseAdapter.notifyDataSetChanged();
 			}
 		});
-		
+
+		this.mCaseList.setOnDeleteItemListener(new OnDeleteItemListener(){
+			@Override
+			public void deleteItem(ItemViewBase item) {
+				// TODO Auto-generated method stub
+				deleteEvent(item);
+			}
+		});
 		this.theme = Utils.getThemeById(2);
 	}
 
@@ -99,6 +109,7 @@ public class CaseActivity extends Activity implements OnSharedPreferenceChangeLi
 	protected void onResume(){
 		super.onResume();
 		this.getCasesFromDb();
+		MobclickAgent.onResume(this);
 	}
 
 	@Override
@@ -115,6 +126,7 @@ public class CaseActivity extends Activity implements OnSharedPreferenceChangeLi
 		ContentValues cv = new ContentValues();
 		cv.put(EventModel.COUNT, this.mCaseAdapter.getCount());
 		dbHelper.update(DbHelper.TABLE.EVENTS, cv, ItemModelBase.ID + "=" + this.mEventId, null);
+		MobclickAgent.onPause(this);
 	}
 	
 	public int calculateColor(int o){
@@ -122,6 +134,13 @@ public class CaseActivity extends Activity implements OnSharedPreferenceChangeLi
 		return this.theme.calculateColor(n, o);
 	}
 
+	private void deleteEvent(ItemViewBase item) {
+		// TODO Auto-generated method stub
+		int itemId = item.getModel().getId();
+		this.mCaseArray.remove(item);
+		this.mCaseAdapter.notifyDataSetChanged();
+		Utils.deleteCaseByCaseId(this, itemId);
+	}
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
