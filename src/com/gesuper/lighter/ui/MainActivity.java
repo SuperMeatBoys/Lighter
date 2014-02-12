@@ -113,7 +113,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	    
 		SharedPreferences mPerferences = PreferenceManager  
 		        .getDefaultSharedPreferences(this);
-		int themeId = mPerferences.getInt("theme_id", 0);  
+		int themeId = mPerferences.getInt("event_theme_id", 0);  
 		this.theme = Utils.getThemeById(themeId);
 	}
 
@@ -178,9 +178,9 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	
 	public void deleteEvent(ItemViewBase item){
 		int itemId = item.getModel().getId();
-		this.mEventArray.remove(item);
+		this.mEventArray.remove(item.getModel().getSequence()-1);
 		this.mEventAdapter.notifyDataSetChanged();
-		Utils.deleteCasesByEventId(this, itemId);
+		Utils.deleteEventByEventId(this, itemId);
 	}
 
 	@Override

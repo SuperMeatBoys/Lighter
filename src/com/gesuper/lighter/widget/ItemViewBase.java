@@ -2,10 +2,9 @@ package com.gesuper.lighter.widget;
 
 import com.gesuper.lighter.R;
 import com.gesuper.lighter.model.ItemModelBase;
+import com.gesuper.lighter.tools.Utils;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
@@ -91,10 +90,12 @@ public class ItemViewBase extends LinearLayout {
 		inputManager.showSoftInput(this.mContentEt, 0);
 	}
 	
-	public void endEdit(){
+	public void endEdit(boolean isEvent){
 		// TODO Auto-generated method stub
 		this.mContentEt.setVisibility(View.GONE);
 		this.mContentTv.setVisibility(View.VISIBLE);
+		this.mContentTv.setText(this.mContentEt.getText());
+		Utils.saveItemContent(context, isEvent, model.getId(), this.mContentEt.getText().toString());
 	}
 	
 	public void calcFocusRect(){
@@ -133,7 +134,7 @@ public class ItemViewBase extends LinearLayout {
 		this.mContentLinear.setBackgroundColor( color );
 	}
 	
-	public void finishItem() {
+	public void finishItem(boolean isEvent, int n, int o) {
 		// TODO Auto-generated method stub
 		if(this.status == NORMAL){
 			this.mContentTv.getPaint().setFlags(Paint. STRIKE_THRU_TEXT_FLAG );
@@ -141,7 +142,7 @@ public class ItemViewBase extends LinearLayout {
 			this.status = FINISHED;
 		} else {
 			this.mContentTv.getPaint().setFlags(Paint.LINEAR_TEXT_FLAG);
-			this.mContentLinear.setBackgroundResource(R.drawable.event_bg);
+			this.mContentLinear.setBackgroundColor(Utils.getThemeColor(context, isEvent, n, o));
 			this.status = NORMAL;
 		}
 	}

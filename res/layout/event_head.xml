@@ -32,43 +32,13 @@
 			android:paddingBottom="@dimen/item_padding"
 			android:textStyle="bold"/>
 	</LinearLayout>
-	<LinearLayout
-	    android:layout_width="match_parent"
-		android:layout_height="@dimen/item_height"
-		android:orientation="horizontal"
-		android:gravity="center"
-		android:background="@color/activity_bg"
-		android:id="@+id/item_head_switch"
-	    android:visibility="gone">
-		<ImageView 
-	    	android:layout_width="wrap_content"
-	    	android:layout_height="wrap_content"
-			android:id="@+id/item_head_switch_bitmap"
-	    	android:contentDescription="@string/hello_world"
-	    	android:src="@drawable/arrow"/>
-		<TextView 
-		    android:layout_width="wrap_content"
-		    android:layout_height="match_parent"
-		    android:layout_gravity="center"
-		    android:text="@string/case_switch_list"
-		    android:textSize="@dimen/item_text_size"
-		    android:paddingTop="@dimen/item_padding"
-		    android:paddingBottom="@dimen/item_padding"
-		    android:textStyle="bold">
-		</TextView>
-	</LinearLayout>
     
 	<LinearLayout
 	    android:layout_width="match_parent"
 		android:layout_height="@dimen/item_height"
-		android:orientation="vertical"
-		android:id="@+id/item_head_linear">
-	    <LinearLayout
-			android:id="@+id/item_linear"
-	        android:layout_width="match_parent"
-	        android:layout_height="@dimen/item_height"
-	        android:background="@drawable/event_bg"
-	        android:orientation="horizontal" >
+		android:id="@+id/item_head_linear"
+		android:background="@drawable/event_bg"
+	    android:orientation="horizontal" >
 			<FrameLayout 
 			    android:layout_width="0dp"
 		        android:layout_height="wrap_content"
@@ -103,29 +73,6 @@
 		        android:gravity="center"
 		        android:textSize="@dimen/item_text_size"
 		        android:textStyle="bold" />
-	
-	    </LinearLayout>
-	
-		<LinearLayout
-		    android:id="@+id/item_image"
-		    android:layout_width="match_parent"
-			android:layout_height="@dimen/item_height"
-			android:visibility="gone"
-			android:gravity="center"
-			android:background="#000000">
-			<ImageView
-			    android:id="@+id/item_head_image"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:contentDescription="@string/arrow_description"
-			    android:src="@drawable/arrow" />
-			<TextView 
-			    android:id="@+id/item_head_text"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textStyle="bold"
-				android:text="@string/case_switch_list"/>
-		</LinearLayout>
 	</LinearLayout>
 	
 	<ImageView

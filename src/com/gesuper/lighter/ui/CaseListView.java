@@ -14,7 +14,7 @@ public class CaseListView extends MoveableListView {
 	}
 	
 	public CaseListView(Context context, AttributeSet attrs){
-		super(context, attrs, R.layout.case_head, R.layout.case_foot);
+		super(context, attrs, R.layout.case_head, R.layout.case_foot, false);
 		// TODO Auto-generated constructor stub
 	}
 }

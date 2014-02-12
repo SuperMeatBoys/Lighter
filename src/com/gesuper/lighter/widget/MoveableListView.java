@@ -130,6 +130,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			MoveableListView.this.startEditItem(message.what);
 		}
 	};
+
+	private boolean isEvent;
 	
 	public MoveableListView(Context context) {
 		super(context);
@@ -138,12 +140,13 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.initResource();
 	}
 	 
-	public MoveableListView(Context context, AttributeSet attrs, int headLayout, int footLayout){
+	public MoveableListView(Context context, AttributeSet attrs, int headLayout, int footLayout, boolean isEvent){
 		super(context, attrs);
 		// TODO Auto-generated constructor stub
 		this.context = context;
 		this.headLayout = headLayout;
 		this.footLayout = footLayout;
+		this.isEvent = isEvent;
 		this.initResource();
 	}
 	
@@ -176,6 +179,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.mHeadText = (EditText) this.mHeadView.findViewById(R.id.item_content_et);
 		this.mHeadImage = (ImageView) this.mHeadView.findViewById(R.id.item_head_bitmap);
 		this.mHeadHeight = (int) this.context.getResources().getDimension(R.dimen.item_height);
+		this.mHeadLinear.setBackgroundColor(Utils.getThemeColor(context, this.isEvent, 3, 0));
 		this.mHeadBitmap = Utils.getBitmapofView(this.mHeadView);
 		this.addHeaderView(this.mHeadView);
 		this.mHeadView.setPadding(this.mHeadView.getPaddingLeft(), -1 * this.mHeadHeight, this.mHeadView.getPaddingRight(), this.mHeadView.getPaddingBottom());
@@ -287,8 +291,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.mHeadLinear.setVisibility(View.GONE);
 				this.mHeadImage.setVisibility(View.VISIBLE);
 			} else if( y > 2*this.mHeadHeight){
-				this.headStatus = HEAD_SWITCH;
-				//if(this.context instanceof CaseActivity){
+				if(!this.isEvent){
+					this.headStatus = HEAD_SWITCH;
 					Bitmap bm = Utils.getBitmapofView(ActivityHelper.getInstance().getMain().getLayoutView());
 					this.mSwitchHeight = this.mHeadHeight * Utils.getEventCount(context);
 					bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), this.mSwitchHeight);
@@ -308,7 +312,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 						
 					};
 					this.mHeadLinear.startAnimation(Utils.createFadeOutAnimation(listener));
-				//}
+				}
 			}
 			break;
 		case HEAD_CREATING:
@@ -345,8 +349,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.mHeadSwitch.setVisibility(View.GONE);
 				this.mHeadLinear.setVisibility(View.VISIBLE);
 			} else if(y < 3*this.mHeadHeight){
-				if(this.context instanceof CaseActivity){
-					//this.mSwitchView.setPadding(0, (-this.mSwitchHeight) + y - 2*this.mHeadHeight , 0, 0);
+				if(!this.isEvent){
+					this.mSwitchImage.setPadding(0, (-this.mSwitchHeight) + y - 2*this.mHeadHeight , 0, 0);
 				}
 			}
 		}
@@ -442,7 +446,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			}
 		} else {
 			scrollToOrigin();
-			this.currentItem.endEdit();
+			this.currentItem.endEdit(this.isEvent);
 		}
 	}
 	
@@ -588,6 +592,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			int position = this.pointToPosition((int)e.getOffsetX(), (int)e.getOffsetY());
 			if(position == INVALID_POSITION){
 				//create new item on bottom
+				this.mFootBitmap = this.createFootViewImage();
+				this.mFootImage.setImageBitmap(this.mFootBitmap);
 				this.mFootPlaceHolder.setVisibility(View.GONE);
 				this.mFootImage.setVisibility(View.VISIBLE);
 				this.mFootImage.startAnimation(this.rotate3dAnimation);
@@ -639,7 +645,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			break;
 		case HANDLE_ITEM_MOVE:
 			if(this.itemStatus == ITEM_FINISH){
-				this.currentItem.finishItem();
+				this.currentItem.finishItem(this.isEvent, this.getChildCount()-2, this.currentItem.getModel().getSequence());
 			} else if(this.itemStatus == ITEM_DELETE){
 				new AlertDialog.Builder(this.context)   
 				.setTitle(R.string.alert_delete_event_title)
@@ -706,71 +712,90 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		}
 		return false;
 	}
+	
+	private Bitmap createFootViewImage() {
+		// TODO Auto-generated method stub
+		this.removeFooterView(this.mFootView);
+		
+		this.mFootImage.setVisibility(View.GONE);
+		this.mFootPlaceHolder.setVisibility(View.GONE);
+		this.mFootLinear.setVisibility(View.VISIBLE);
+		
+		this.mFootLinear.setBackgroundColor(Utils.getThemeColor(context, isEvent, this.getChildCount()-2, this.getChildCount()-2));
+		
+		this.measureView(this.mFootView);
+		Bitmap bitmap =  Utils.getBitmapofView(this.mFootView, this.screenWidth);
+		
+		this.mFootLinear.setVisibility(View.GONE);
+		this.addFooterView(this.mFootView);
+		return bitmap;
+	}
 
 	@Override
 	public boolean onFling(MultiMotionEvent e1, MultiMotionEvent e2, float velocityX,
 			float velocityY) {
 		// TODO Auto-generated method stub
 		Log.v(TAG, "onFling " + e2.getX() + " " + e2.getY());
-		switch(this.status){
-		case HANDLE_NOTHING:
-			break;
-		case HANDLE_HEAD:
-			if(this.headStatus == HEAD_CREATING){
-				this.headStatus = HEAD_DONE;
-				this.endEditItem(0);
-			}else if(this.headStatus == HEAD_RELEASE){
-				this.headStatus = HEAD_CREATING;
-				this.updateHeadStatus(0);
-				this.startEditItem(0);
-			}else {
-				this.updateHeadStatus(0);
-				this.status = HANDLE_NOTHING;
-			}
-			break;
-		case HANDLE_ITEM_MOVE:
-			if(this.itemStatus == ITEM_FINISH){
-				this.currentItem.finishItem();
-			}
-			this.updateItemStatus(0);
-			this.status = HANDLE_NOTHING;
-			break;
-		case HANDLE_LONGPRESS:
-			this.status = HANDLE_NOTHING;
-			stopDrag();
-			break;
-		case HANDLE_MULTI:
-			if(this.mGesture.getFingerCount() == 0){
-				this.setPadding(0, initPaddingTop, 0, 0);
-				Log.v(TAG, "no finger on screen");
-				this.dBelow = 0; this.dUp = 0;
-				this.status = HANDLE_NOTHING;
-			}
-			break;
-		case HANDLE_MULTI_USE:
-			if(e1.getId() == this.upTouch){
-				this.setPadding(0, 0, 0, 0);
-				this.upItem.setPadding(0, 0, 0, 0);
-				this.dUp = (int) (e2.getY() - e1.getY()) * (-1);
-			} else if(e1.getId() == this.belowTouch){
-				this.belowItem.setPadding(0, 0, 0, 0);
-				this.dBelow = (int) (e2.getY() - e1.getY());
-			}
-			if(this.mGesture.getFingerCount() == 0){
-				this.setPadding(0, initPaddingTop, 0, 0);
-				this.createImage.setImageBitmap(null);
-				this.createImage.setPadding(0, 0, 0, 0);
-				if(this.isNeedCreateMiddleItem){
-					int p = this.getPositionForView(belowItem);
-					this.newItemListener.createNewItem(p, "");
-					this.startEditItemHandler.sendEmptyMessageDelayed(p, 300);
-				}
-				this.dBelow = 0; this.dUp = 0;
-				this.status = HANDLE_NOTHING;
-			}
-			break;
-		}
-		return false;
+		return this.onSingleTapUp(e2);
+//		switch(this.status){
+//		case HANDLE_NOTHING:
+//			break;
+//		case HANDLE_HEAD:
+//			if(this.headStatus == HEAD_CREATING){
+//				this.headStatus = HEAD_DONE;
+//				this.endEditItem(0);
+//			}else if(this.headStatus == HEAD_RELEASE){
+//				this.headStatus = HEAD_CREATING;
+//				this.updateHeadStatus(0);
+//				this.startEditItem(0);
+//			}else {
+//				this.updateHeadStatus(0);
+//				this.status = HANDLE_NOTHING;
+//			}
+//			break;
+//		case HANDLE_ITEM_MOVE:
+//			if(this.itemStatus == ITEM_FINISH){
+//				this.currentItem.finishItem();
+//			}
+//			this.updateItemStatus(0);
+//			this.status = HANDLE_NOTHING;
+//			break;
+//		case HANDLE_LONGPRESS:
+//			this.status = HANDLE_NOTHING;
+//			stopDrag();
+//			break;
+//		case HANDLE_MULTI:
+//			if(this.mGesture.getFingerCount() == 0){
+//				this.setPadding(0, initPaddingTop, 0, 0);
+//				Log.v(TAG, "no finger on screen");
+//				this.dBelow = 0; this.dUp = 0;
+//				this.status = HANDLE_NOTHING;
+//			}
+//			break;
+//		case HANDLE_MULTI_USE:
+//			if(e1.getId() == this.upTouch){
+//				this.setPadding(0, 0, 0, 0);
+//				this.upItem.setPadding(0, 0, 0, 0);
+//				this.dUp = (int) (e2.getY() - e1.getY()) * (-1);
+//			} else if(e1.getId() == this.belowTouch){
+//				this.belowItem.setPadding(0, 0, 0, 0);
+//				this.dBelow = (int) (e2.getY() - e1.getY());
+//			}
+//			if(this.mGesture.getFingerCount() == 0){
+//				this.setPadding(0, initPaddingTop, 0, 0);
+//				this.createImage.setImageBitmap(null);
+//				this.createImage.setPadding(0, 0, 0, 0);
+//				if(this.isNeedCreateMiddleItem){
+//					int p = this.getPositionForView(belowItem);
+//					this.newItemListener.createNewItem(p, "");
+//					this.startEditItemHandler.sendEmptyMessageDelayed(p, 300);
+//				}
+//				this.dBelow = 0; this.dUp = 0;
+//				this.status = HANDLE_NOTHING;
+//			}
+//			break;
+//		}
+//		return false;
 	}
 	
 	@Override

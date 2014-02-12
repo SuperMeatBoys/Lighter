@@ -2,25 +2,18 @@ package com.gesuper.lighter.widget;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 public class HeadViewBase extends FrameLayout {
 	public final static String TAG = "HeadViewBase";
-	private Context context;
 	private Matrix mMatrix;
-	private Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG); 
-	 private Bitmap mBitmap;
-	private Canvas canvas;
-    
+	private Bitmap mBitmap;
 	public HeadViewBase(Context context, int layoutId) {
 		super(context);
 		// TODO Auto-generated constructor stub
 		inflate(context, layoutId, this);
-		this.context = context;
 	}
 	
 	public HeadViewBase(Context context, AttributeSet attrs){

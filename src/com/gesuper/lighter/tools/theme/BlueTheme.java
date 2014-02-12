@@ -5,7 +5,7 @@ import com.gesuper.lighter.tools.Utils;
 public class BlueTheme extends ThemeBase{
 	private double baseH = 212, baseS = 93, baseL = 53;
 	private double stepH = -2.5, stepS = 1, stepL = 2.5;
-	private int maxColorSpan = 5;
+	private int maxColorSpan = 6;
 	private double spanH = maxColorSpan * stepH, spanS = maxColorSpan * stepS, spanL = maxColorSpan * stepL;
 	public int calculateColor(int n, int o){
 		double dH = stepH, dS = stepS, dL = stepL;

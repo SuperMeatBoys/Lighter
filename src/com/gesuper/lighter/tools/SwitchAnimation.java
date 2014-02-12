@@ -1,6 +1,5 @@
 package com.gesuper.lighter.tools;
 
-import android.graphics.Camera;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;

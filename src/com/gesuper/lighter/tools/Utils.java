@@ -1,16 +1,18 @@
 package com.gesuper.lighter.tools;
 
 import com.gesuper.lighter.model.CaseModel;
+import com.gesuper.lighter.model.EventModel;
 import com.gesuper.lighter.model.ItemModelBase;
 import com.gesuper.lighter.tools.DbHelper.TABLE;
 import com.gesuper.lighter.tools.theme.*;
 
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningTaskInfo;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -20,7 +22,7 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 
 public class Utils {
-	
+	public static String TAG = "Utils";
 	//change color from hsl to rgb
 	public static int HSLToRGB(double h, double s, double l){
 		double R,G,B;
@@ -95,6 +97,18 @@ public class Utils {
 		view.draw(c);
 		return b;
 	}
+
+	public static Bitmap getBitmapofView(ViewGroup view, int screenWidth) {
+		// TODO Auto-generated method stub
+		view.measure(
+				MeasureSpec.makeMeasureSpec(screenWidth, MeasureSpec.EXACTLY),
+		        MeasureSpec.makeMeasureSpec(view.getMeasuredHeight(), MeasureSpec.EXACTLY));
+    	view.layout(0, 0, view.getMeasuredWidth(),view.getMeasuredHeight());
+		Bitmap b = Bitmap.createBitmap(screenWidth, view.getMeasuredHeight(), Bitmap.Config.RGB_565);
+		Canvas c = new Canvas(b);
+		view.draw(c);
+		return b;
+	}
     
     public static Animation createFadeOutAnimation(AnimationListener listener){
     	AlphaAnimation animation = new AlphaAnimation(1.0F, 0.0F);
@@ -139,7 +153,14 @@ public class Utils {
         }
       return null;
     }
+    
+    public static boolean deleteEventByEventId(Context context, int eventId){
+    	DbHelper dbHelper = DbHelper.getInstance(context);
 
+		dbHelper.delete(DbHelper.TABLE.CASES, CaseModel.EVENT_ID + " = " + eventId, null);
+		return dbHelper.delete(DbHelper.TABLE.EVENTS, EventModel.ID + " = " + eventId, null);
+    }
+    
 	public static boolean deleteCasesByEventId(Context context, int itemId) {
 		// TODO Auto-generated method stub
 		DbHelper dbHelper = DbHelper.getInstance(context);
@@ -150,5 +171,22 @@ public class Utils {
 		// TODO Auto-generated method stub
 		DbHelper dbHelper = DbHelper.getInstance(context);
 		return dbHelper.delete(DbHelper.TABLE.CASES, ItemModelBase.ID + " = " + itemId, null);
+	}
+	
+	public static int getThemeColor(Context context, boolean isEvent, int n, int o){
+		SharedPreferences mPerferences = PreferenceManager  
+		        .getDefaultSharedPreferences(context);
+		int themeId = mPerferences.getInt(isEvent?"event_theme_id":"case_theme_id", isEvent?0:2);  
+		ThemeBase theme = Utils.getThemeById(themeId);
+		Log.v(TAG, ""+n+" " + o + " "+ theme.calculateColor(n, o));
+		return theme.calculateColor(n, o);
+	}
+
+	public static void saveItemContent(Context context, boolean isEvent, int itemId, String content) {
+		// TODO Auto-generated method stub
+		DbHelper dbHelper = DbHelper.getInstance(context);
+		ContentValues cv = new ContentValues();
+		cv.put(ItemModelBase.CONTENT, content);
+		dbHelper.update(isEvent?DbHelper.TABLE.EVENTS:DbHelper.TABLE.CASES, cv, ItemModelBase.ID + " = " + itemId, null);
 	}
 }

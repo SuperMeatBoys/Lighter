@@ -14,7 +14,7 @@ public class EventListView extends MoveableListView {
 	}
 	
 	public EventListView(Context context, AttributeSet attrs){
-		super(context, attrs, R.layout.event_head, R.layout.event_foot);
+		super(context, attrs, R.layout.event_head, R.layout.event_foot, true);
 		// TODO Auto-generated constructor stub
 	}
 }
