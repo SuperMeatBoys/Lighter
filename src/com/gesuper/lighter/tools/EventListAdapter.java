@@ -2,6 +2,7 @@ package com.gesuper.lighter.tools;
 
 import java.util.List;
 
+import com.gesuper.lighter.R;
 import com.gesuper.lighter.model.EventModel;
 import com.gesuper.lighter.ui.MainActivity;
 import com.gesuper.lighter.widget.EventItemView;
@@ -50,8 +51,13 @@ public class EventListAdapter extends BaseAdapter{
 		else mItemView  = new EventItemView(this.context);
 
 		EventModel mItemModel = this.listItems.get(position);
+		mItemModel.setSequence(position);
 		mItemView.setModel(mItemModel);
 		mItemView.setBgColor(((MainActivity) this.context).calculateColor(position));
+		if(position == 0){
+			View v = mItemView.findViewById(R.id.item_linear_bg);
+			v.setPadding(v.getPaddingLeft(), v.getPaddingBottom(), v.getPaddingRight(), v.getPaddingBottom());
+		}
         return mItemView;
 	}
 

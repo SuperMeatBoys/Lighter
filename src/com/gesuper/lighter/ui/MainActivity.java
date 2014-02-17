@@ -47,7 +47,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		setContentView(R.layout.activity_main);
 		ActivityHelper.getInstance().setMain(this);
 		this.initResource();
-		Log.v(TAG, Utils.getDeviceInfo(this));
+		//Log.v(TAG, Utils.getDeviceInfo(this));
 	}
 
 	private void initResource() {
@@ -78,7 +78,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 					mEventArray.add(em);
 					break;
 				default:
-					mEventArray.add(position, em);
+					mEventArray.add(position-1, em);
 					break;
 				}
 				mEventAdapter.notifyDataSetChanged();
@@ -178,7 +178,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	
 	public void deleteEvent(ItemViewBase item){
 		int itemId = item.getModel().getId();
-		this.mEventArray.remove(item.getModel().getSequence()-1);
+		this.mEventArray.remove(item.getModel().getSequence());
 		this.mEventAdapter.notifyDataSetChanged();
 		Utils.deleteEventByEventId(this, itemId);
 	}

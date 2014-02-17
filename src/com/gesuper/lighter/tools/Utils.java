@@ -91,8 +91,8 @@ public class Utils {
     	view.measure(
 				MeasureSpec.makeMeasureSpec(view.getMeasuredWidth(), MeasureSpec.EXACTLY),
 		        MeasureSpec.makeMeasureSpec(view.getMeasuredHeight(), MeasureSpec.EXACTLY));
-    	view.layout(0, 0, view.getMeasuredWidth(),view.getMeasuredHeight());
-		Bitmap b = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.RGB_565);
+    	view.layout(0, 0, view.getMeasuredWidth(),view.getMeasuredHeight() + 1);
+		Bitmap b = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight() + 1, Bitmap.Config.RGB_565);
 		Canvas c = new Canvas(b);
 		view.draw(c);
 		return b;
@@ -102,9 +102,9 @@ public class Utils {
 		// TODO Auto-generated method stub
 		view.measure(
 				MeasureSpec.makeMeasureSpec(screenWidth, MeasureSpec.EXACTLY),
-		        MeasureSpec.makeMeasureSpec(view.getMeasuredHeight(), MeasureSpec.EXACTLY));
+		        MeasureSpec.makeMeasureSpec(view.getMeasuredHeight() + 1, MeasureSpec.EXACTLY));
     	view.layout(0, 0, view.getMeasuredWidth(),view.getMeasuredHeight());
-		Bitmap b = Bitmap.createBitmap(screenWidth, view.getMeasuredHeight(), Bitmap.Config.RGB_565);
+		Bitmap b = Bitmap.createBitmap(screenWidth, view.getMeasuredHeight() + 1, Bitmap.Config.RGB_565);
 		Canvas c = new Canvas(b);
 		view.draw(c);
 		return b;

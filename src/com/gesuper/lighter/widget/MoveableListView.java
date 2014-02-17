@@ -127,6 +127,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	private OnDeleteItemListener deleteItemListener;
 	private Handler startEditItemHandler = new Handler(){
 		public void handleMessage(Message message){
+			MoveableListView.this.currentItem = (ItemViewBase) MoveableListView.this.getChildAt(message.what);
 			MoveableListView.this.startEditItem(message.what);
 		}
 	};
@@ -203,8 +204,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.mFootPlaceHolder.setVisibility(View.GONE);
 		
 		this.translateAnimation = new TranslateAnimation(0, -screenWidth, 0, 0);
-		this.translateAnimation.setDuration(500L);
-		this.translateAnimation.setInterpolator(new AccelerateInterpolator());
+		this.translateAnimation.setDuration(300L);
 		this.translateAnimation.setAnimationListener(new AnimationListener(){
 			@Override
 			public void onAnimationEnd(Animation arg0) {
@@ -223,7 +223,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			public void onAnimationStart(Animation arg0) {}
 		});
 		this.rotate3dAnimation = new Rotate3DAnimation(-90,0, this.mFootBitmap.getWidth()/2);
-		this.rotate3dAnimation.setDuration(500L);
+		this.rotate3dAnimation.setDuration(300L);
 		this.rotate3dAnimation.setAnimationListener(new AnimationListener(){
 			@Override
 			public void onAnimationEnd(Animation arg0) {
@@ -295,6 +295,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 					this.headStatus = HEAD_SWITCH;
 					Bitmap bm = Utils.getBitmapofView(ActivityHelper.getInstance().getMain().getLayoutView());
 					this.mSwitchHeight = this.mHeadHeight * Utils.getEventCount(context);
+					Log.v(TAG, "event count " + mSwitchHeight);
 					bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), this.mSwitchHeight);
 					this.mSwitchImage.setImageBitmap(bm);
 					this.mSwitchImage.setPadding(0, 0, 0, this.mHeadHeight);
@@ -350,7 +351,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.mHeadLinear.setVisibility(View.VISIBLE);
 			} else if(y < 3*this.mHeadHeight){
 				if(!this.isEvent){
-					this.mSwitchImage.setPadding(0, (-this.mSwitchHeight) + y - 2*this.mHeadHeight , 0, 0);
+					//this.mSwitchImage.setPadding(0, (-this.mSwitchHeight) + y - 2*this.mHeadHeight , 0, 0);
 				}
 			}
 		}
@@ -365,7 +366,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		if(this.headStatus == HEAD_SWITCH ){
 			paddingTop -= this.mSwitchHeight + this.mHeadHeight;
 		}
-
 		this.mHeadView.setPadding(0, paddingTop, 0, 0);
 	}
 
@@ -409,17 +409,17 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			this.mFootText.requestFocus();
 			inputManager.showSoftInput(this.mFootText, 0);
 		} else {
-			scrollItemToTop(position);
+			//scrollItemToTop(position);
 			this.currentItem.startEdit();
 		}
 	}
 	
 	private void endEditItem(int index) {
 		// TODO Auto-generated method stub
-		this.showBelowItems(index);
 		InputMethodManager inputManager = 
 			(InputMethodManager)this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 		inputManager.hideSoftInputFromWindow(this.mHeadText.getWindowToken(), 0);
+		this.showBelowItems(index);
 		if(index == 0){		//end edit head view
 			String content = this.mHeadText.getText().toString();
 			if(content.length() == 0){
@@ -566,6 +566,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.belowItem = (ItemViewBase) this.getChildAt(p2 - this.getFirstVisiblePosition());
 				this.createImage = (ImageView) this.belowItem.findViewById(R.id.item_create_image);
 				this.createImage.setVisibility(View.VISIBLE);
+				this.mFootBitmap = this.createItemViewImage(p2);
 				this.upItem = (ItemViewBase) this.getChildAt(p1 - this.getFirstVisiblePosition());
 			} catch(ClassCastException error){
 				Log.v(TAG, "ClassCastException");
@@ -592,7 +593,8 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			int position = this.pointToPosition((int)e.getOffsetX(), (int)e.getOffsetY());
 			if(position == INVALID_POSITION){
 				//create new item on bottom
-				this.mFootBitmap = this.createFootViewImage();
+				this.mFootBitmap = this.createItemViewImage(this.getChildCount()-2);
+				Log.v(TAG, "footbitmap " + this.mFootBitmap.getWidth() + " " + this.mFootBitmap.getHeight());
 				this.mFootImage.setImageBitmap(this.mFootBitmap);
 				this.mFootPlaceHolder.setVisibility(View.GONE);
 				this.mFootImage.setVisibility(View.VISIBLE);
@@ -704,16 +706,18 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 					int p = this.getPositionForView(belowItem);
 					this.newItemListener.createNewItem(p, "");
 					this.startEditItemHandler.sendEmptyMessageDelayed(p, 300);
+					this.status = HANDLE_ITEM_EDITING;
+				} else {
+					this.status = HANDLE_NOTHING;
 				}
 				this.dBelow = 0; this.dUp = 0;
-				this.status = HANDLE_NOTHING;
 			}
 			break;
 		}
 		return false;
 	}
 	
-	private Bitmap createFootViewImage() {
+	private Bitmap createItemViewImage(int index) {
 		// TODO Auto-generated method stub
 		this.removeFooterView(this.mFootView);
 		
@@ -721,7 +725,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		this.mFootPlaceHolder.setVisibility(View.GONE);
 		this.mFootLinear.setVisibility(View.VISIBLE);
 		
-		this.mFootLinear.setBackgroundColor(Utils.getThemeColor(context, isEvent, this.getChildCount()-2, this.getChildCount()-2));
+		this.mFootLinear.setBackgroundColor(Utils.getThemeColor(context, isEvent, this.getChildCount()-2, index));
 		
 		this.measureView(this.mFootView);
 		Bitmap bitmap =  Utils.getBitmapofView(this.mFootView, this.screenWidth);

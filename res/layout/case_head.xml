@@ -36,15 +36,10 @@
 	<LinearLayout
 	    android:layout_width="match_parent"
 		android:layout_height="@dimen/item_height"
-		android:orientation="vertical"
+		android:orientation="horizontal"
+		android:baselineAligned="false"
+		android:background="@drawable/case_bg"
 		android:id="@+id/item_head_linear">
-	    <LinearLayout
-			android:id="@+id/item_linear"
-	        android:layout_width="match_parent"
-	        android:layout_height="@dimen/item_height"
-	        android:background="@drawable/case_bg"
-	        android:baselineAligned="false"
-	        android:orientation="horizontal" >
 			<FrameLayout 
 			    android:layout_width="0dp"
 		        android:layout_height="wrap_content"
@@ -68,29 +63,6 @@
 			        android:textStyle="bold" />
 	
 			</FrameLayout>
-	
-	    </LinearLayout>
-	
-		<LinearLayout
-		    android:id="@+id/item_image"
-		    android:layout_width="match_parent"
-			android:layout_height="@dimen/item_height"
-			android:visibility="gone"
-			android:gravity="center"
-			android:background="#000000">
-			<ImageView
-			    android:id="@+id/item_head_image"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:contentDescription="@string/arrow_description"
-			    android:src="@drawable/arrow" />
-			<TextView 
-			    android:id="@+id/item_head_text"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textStyle="bold"
-				android:text="@string/case_switch_list"/>
-		</LinearLayout>
 	</LinearLayout>
 	
 	<ImageView

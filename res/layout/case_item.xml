@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/activity_bg"
     android:baselineAligned="false" 
     android:orientation="vertical">
     <ImageView
@@ -36,7 +35,8 @@
 	        android:id="@+id/item_linear_bg"
 	        android:layout_width="match_parent"
 	        android:layout_height="@dimen/item_height"
-	        android:background="@drawable/case_bg">
+	        android:background="@drawable/case_bg"
+            android:paddingBottom="1dp">
 		    <LinearLayout
 		        android:id="@+id/item_linear"
 		        android:layout_width="match_parent"

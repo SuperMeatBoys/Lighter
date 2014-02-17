@@ -1,4 +1,3 @@
-
 package com.gesuper.lighter.widget;
 
 import java.util.ArrayList;
