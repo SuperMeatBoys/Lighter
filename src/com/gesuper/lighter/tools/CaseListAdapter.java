@@ -2,9 +2,11 @@ package com.gesuper.lighter.tools;
 
 import java.util.List;
 
+import com.gesuper.lighter.R;
 import com.gesuper.lighter.model.CaseModel;
 import com.gesuper.lighter.ui.CaseActivity;
 import com.gesuper.lighter.widget.CaseItemView;
+
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +52,10 @@ public class CaseListAdapter extends BaseAdapter{
 		CaseModel mItemModel = this.listItems.get(position);
 		mItemView.setModel(mItemModel);
 		mItemView.setBgColor(((CaseActivity) this.context).calculateColor(position));
+		if(position == 0){
+			View v = mItemView.findViewById(R.id.item_linear_bg);
+			v.setPadding(v.getPaddingLeft(), v.getPaddingBottom(), v.getPaddingRight(), v.getPaddingBottom());
+		}
         return mItemView;
 	}
 	

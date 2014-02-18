@@ -80,8 +80,8 @@ public class ItemViewBase extends LinearLayout {
 	public void startEdit() {
 		// TODO Auto-generated method stub
 		Log.v(TAG, "startEdit");
-		this.mContentTv.setVisibility(View.GONE);
 		this.mContentEt.setVisibility(View.VISIBLE);
+		this.mContentTv.setVisibility(View.GONE);
 		this.mContentEt.setSelection(this.mContentEt.getEditableText().length());
 		this.mContentEt.requestFocus();
 
@@ -95,7 +95,10 @@ public class ItemViewBase extends LinearLayout {
 		this.mContentEt.setVisibility(View.GONE);
 		this.mContentTv.setVisibility(View.VISIBLE);
 		this.mContentTv.setText(this.mContentEt.getText());
+		model.setContent(this.mContentEt.getText().toString());
 		Utils.saveItemContent(context, isEvent, model.getId(), this.mContentEt.getText().toString());
+
+		Log.v(TAG, "endedit " + this.mContentEt.getText() + " " + model.getId() + " " + isEvent);
 	}
 	
 	public void calcFocusRect(){

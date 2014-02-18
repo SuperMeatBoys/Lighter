@@ -187,6 +187,7 @@ public class Utils {
 		DbHelper dbHelper = DbHelper.getInstance(context);
 		ContentValues cv = new ContentValues();
 		cv.put(ItemModelBase.CONTENT, content);
+		cv.put(ItemModelBase.MODIFY_DATE, System.currentTimeMillis());
 		dbHelper.update(isEvent?DbHelper.TABLE.EVENTS:DbHelper.TABLE.CASES, cv, ItemModelBase.ID + " = " + itemId, null);
 	}
 }

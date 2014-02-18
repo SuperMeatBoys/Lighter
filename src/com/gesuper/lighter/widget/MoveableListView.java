@@ -3,6 +3,7 @@ package com.gesuper.lighter.widget;
 import com.gesuper.lighter.R;
 import com.gesuper.lighter.tools.ActivityHelper;
 import com.gesuper.lighter.tools.Rotate3DAnimation;
+import com.gesuper.lighter.tools.SmoothScrollAnimation;
 import com.gesuper.lighter.tools.SwitchAnimation;
 import com.gesuper.lighter.tools.Utils;
 import com.gesuper.lighter.ui.CaseActivity;
@@ -133,6 +134,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	};
 
 	private boolean isEvent;
+
+	private int scrollStart;
+
+	private int scrollEnd;
 	
 	public MoveableListView(Context context) {
 		super(context);
@@ -409,8 +414,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			this.mFootText.requestFocus();
 			inputManager.showSoftInput(this.mFootText, 0);
 		} else {
-			//scrollItemToTop(position);
-			this.currentItem.startEdit();
+			scrollItemToTop(position);
 		}
 	}
 	
@@ -446,7 +450,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			}
 		} else {
 			scrollToOrigin();
-			this.currentItem.endEdit(this.isEvent);
 		}
 	}
 	
@@ -454,16 +457,38 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		ViewGroup.LayoutParams p = this.mFootPlaceHolder.getLayoutParams();
 		p.height = this.screenHeight;
 		this.mFootPlaceHolder.setLayoutParams(p);
-		this.scrollY = this.getScrollY();
-		this.smoothScrollToPositionFromTop(position, this.currentItem.getTop());
-		Log.v(TAG, "this.scrollY: " + this.scrollY);
+		this.scrollStart = this.getScrollY();
+		this.scrollEnd = - this.currentItem.getTop();
+		SmoothScrollAnimation smoothScroll = new SmoothScrollAnimation(this, this.scrollStart, this.scrollEnd, SmoothScrollAnimation.SCROLL_TOP);
+		smoothScroll.setDuration(300);
+		smoothScroll.setAnimationListener(new AnimationListener(){
+			public void onAnimationEnd(Animation arg0) {
+				// TODO Auto-generated method stub
+				MoveableListView.this.currentItem.startEdit();
+			}
+			public void onAnimationRepeat(Animation arg0) {}
+			public void onAnimationStart(Animation arg0) {}
+			
+		});
+		this.startAnimation(smoothScroll);
 	}
 	
 	private void scrollToOrigin(){
-		this.scrollTo(0, this.scrollY);
 		ViewGroup.LayoutParams p = this.mFootPlaceHolder.getLayoutParams();
 		p.height = 0;
 		this.mFootPlaceHolder.setLayoutParams(p);
+		SmoothScrollAnimation smoothScroll = new SmoothScrollAnimation(this, this.scrollEnd, this.scrollStart, SmoothScrollAnimation.SCROLL_TOP);
+		smoothScroll.setDuration(300);
+		smoothScroll.setAnimationListener(new AnimationListener(){
+			public void onAnimationEnd(Animation arg0) {
+				// TODO Auto-generated method stub
+				MoveableListView.this.currentItem.endEdit(isEvent);
+			}
+			public void onAnimationRepeat(Animation arg0) {}
+			public void onAnimationStart(Animation arg0) {}
+			
+		});
+		this.startAnimation(smoothScroll);
 	}
 
 	private void hideBelowItems(int index) {
@@ -566,7 +591,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.belowItem = (ItemViewBase) this.getChildAt(p2 - this.getFirstVisiblePosition());
 				this.createImage = (ImageView) this.belowItem.findViewById(R.id.item_create_image);
 				this.createImage.setVisibility(View.VISIBLE);
-				this.mFootBitmap = this.createItemViewImage(p2);
+				this.mFootBitmap = this.createItemViewImage(p2-1);
 				this.upItem = (ItemViewBase) this.getChildAt(p1 - this.getFirstVisiblePosition());
 			} catch(ClassCastException error){
 				Log.v(TAG, "ClassCastException");

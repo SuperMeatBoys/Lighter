@@ -3,6 +3,7 @@ package com.gesuper.lighter.model;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 public class ItemModelBase {
 
@@ -45,6 +46,7 @@ public class ItemModelBase {
 		this.content = cursor.getString(CONTENT_COLUMN);
 		this.sequence = cursor.getInt(SEQUENCE_COLUMN);
 		this.finished = cursor.getShort(STATUS_COLUMN);
+		Log.v("ItemModelBase", "" + this.id + " " +this.content);
 	}
 	
 	protected ItemModelBase(Context context, String content){
