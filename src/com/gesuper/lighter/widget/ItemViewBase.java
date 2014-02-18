@@ -4,7 +4,9 @@ import com.gesuper.lighter.R;
 import com.gesuper.lighter.model.ItemModelBase;
 import com.gesuper.lighter.tools.Utils;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
@@ -90,15 +92,28 @@ public class ItemViewBase extends LinearLayout {
 		inputManager.showSoftInput(this.mContentEt, 0);
 	}
 	
-	public void endEdit(boolean isEvent){
+	public boolean endEdit(boolean isEvent){
 		// TODO Auto-generated method stub
 		this.mContentEt.setVisibility(View.GONE);
 		this.mContentTv.setVisibility(View.VISIBLE);
+		if(this.mContentEt.getText().toString().length() == 0){
+			if(this.mContentTv.getText().toString().length() == 0){
+				return false;
+			} else {
+				new AlertDialog.Builder(this.context)   
+				.setTitle(R.string.alert_warning)
+				.setMessage(R.string.alert_warning_message)  
+				.setPositiveButton(R.string.alert_yes, null) 
+				.show();
+				this.mContentEt.setText(this.mContentTv.getText());
+			}
+		} 
 		this.mContentTv.setText(this.mContentEt.getText());
 		model.setContent(this.mContentEt.getText().toString());
 		Utils.saveItemContent(context, isEvent, model.getId(), this.mContentEt.getText().toString());
-
+		
 		Log.v(TAG, "endedit " + this.mContentEt.getText() + " " + model.getId() + " " + isEvent);
+		return true;
 	}
 	
 	public void calcFocusRect(){

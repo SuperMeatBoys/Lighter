@@ -28,4 +28,6 @@
     <string name="alert_delete_event_message">Do you sure to delete all cases under this event ?</string>
     <string name="alert_yes">Yes</string>
     <string name="alert_no">No</string>
+    <string name="alert_warning">Warning</string>
+    <string name="alert_warning_message">This event\'s content can not to be null !</string>
 </resources>

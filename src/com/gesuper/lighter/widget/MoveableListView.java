@@ -222,6 +222,11 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 					MoveableListView.this.mFootText.setText(null);
 					MoveableListView.this.mFootLinear.setVisibility(View.GONE);
 					MoveableListView.this.mFootPlaceHolder.setVisibility(View.VISIBLE);
+				} else if(MoveableListView.this.status == HANDLE_ITEM_EDITING){
+					if(deleteItemListener != null){
+						deleteItemListener.deleteItem(currentItem);
+					}
+					MoveableListView.this.status = HANDLE_NOTHING;
 				}
 			}
 			public void onAnimationRepeat(Animation arg0) {}
@@ -482,7 +487,12 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 		smoothScroll.setAnimationListener(new AnimationListener(){
 			public void onAnimationEnd(Animation arg0) {
 				// TODO Auto-generated method stub
-				MoveableListView.this.currentItem.endEdit(isEvent);
+				if(!MoveableListView.this.currentItem.endEdit(isEvent)){
+					MoveableListView.this.currentItem.startAnimation(translateAnimation);
+				} else {
+					MoveableListView.this.status = HANDLE_NOTHING;
+				}
+				
 			}
 			public void onAnimationRepeat(Animation arg0) {}
 			public void onAnimationStart(Animation arg0) {}
@@ -703,7 +713,6 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				}
 			}
 			this.endEditItem(1);
-			this.status = HANDLE_NOTHING;
 			break;
 		case HANDLE_FOOT:
 			this.endEditItem(this.getChildCount());
