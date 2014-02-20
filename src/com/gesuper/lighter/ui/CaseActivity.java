@@ -68,7 +68,7 @@ public class CaseActivity extends Activity implements OnSharedPreferenceChangeLi
 					mCaseArray.add(em);
 					break;
 				default:
-					mCaseArray.add(position, em);
+					mCaseArray.add(position-1, em);
 					break;
 				}
 				mCaseAdapter.notifyDataSetChanged();

@@ -16,7 +16,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.Camera;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
@@ -995,28 +997,33 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
     	Camera camera = new Camera();
         camera.save();
         Matrix matrix = new Matrix();
-        // rotate
-        camera.rotateX(angle);
-        camera.rotateY(0);
-        camera.rotateZ(0);
-        // translate
-        camera.translate(0, 0, 0);
-        camera.getMatrix(matrix);
-        // 恢复到之前的初始状态。
-        camera.restore();
-        // 设置图像处理的中心点
-        int w = bitmap.getWidth()/2;
-        matrix.preTranslate(-w, 0);
-        matrix.postTranslate(w, 0); 
-        Bitmap newBit = null;
+        Bitmap upBit = null;
+        Bitmap belowBit = null;
+        Bitmap backBit = bitmap.copy(Config.ARGB_8888, false);
         try {
-            // 经过矩阵转换后的图像宽高有可能不大于0，此时会抛出IllegalArgumentException
-            newBit = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
-        } catch (IllegalArgumentException iae) {
-            iae.printStackTrace();
+            // rotate
+            camera = new Camera();
+            camera.save();
+            camera.rotateX(angle);
+            camera.rotateY(0);
+            camera.rotateZ(0);
+            // translate
+            camera.translate(0, 0, 0);
+            matrix = new Matrix();
+            camera.getMatrix(matrix);
+            // 恢复到之前的初始状态。
+            camera.restore();
+            // 设置图像处理的中心点
+            int w = bitmap.getWidth()/2;
+            matrix.preTranslate(-w, 0);
+            matrix.postTranslate(w, 0);
+            belowBit = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
             return null;
         }
-        return newBit;
+        
+        return belowBit;
     }
     
     private void measureView(View child) {  
