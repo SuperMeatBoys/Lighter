@@ -239,8 +239,10 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			public void onAnimationEnd(Animation arg0) {
 				// TODO Auto-generated method stub
 				mFootImage.setVisibility(View.GONE);
-				mFootLinear.setVisibility(View.VISIBLE);
-				startEditItem(MoveableListView.this.getChildCount());
+				mFootLinear.setVisibility(View.GONE);
+
+				MoveableListView.this.newItemListener.createNewItem(MoveableListView.this.getChildCount()-1, "");
+				MoveableListView.this.startEditItemHandler.sendEmptyMessageDelayed(MoveableListView.this.getChildCount()-1, 200);
 			}
 			public void onAnimationRepeat(Animation arg0) {}
 			public void onAnimationStart(Animation arg0) {}
@@ -410,17 +412,17 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 	public void startEditItem(int position) {
 		// TODO Auto-generated method stub
 		this.hideBelowItems(position);
-		InputMethodManager inputManager = 
-			(InputMethodManager)this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-		if(position == 0){		//edit head view
-			this.mHeadText.requestFocus();
-			inputManager.showSoftInput(this.mHeadText, 0);
-		} else if(position == this.getChildCount()){
-			this.mFootText.requestFocus();
-			inputManager.showSoftInput(this.mFootText, 0);
-		} else {
-			scrollItemToTop(position);
-		}
+		scrollItemToTop(position);
+//		InputMethodManager inputManager = 
+//			(InputMethodManager)this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+//		if(position == 0){		//edit head view
+//			this.mHeadText.requestFocus();
+//			inputManager.showSoftInput(this.mHeadText, 0);
+//		} else if(position == this.getChildCount()){
+//			this.mFootText.requestFocus();
+//			inputManager.showSoftInput(this.mFootText, 0);
+//		} else {
+//		}
 	}
 	
 	private void endEditItem(int index) {
@@ -429,33 +431,33 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 			(InputMethodManager)this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 		inputManager.hideSoftInputFromWindow(this.mHeadText.getWindowToken(), 0);
 		this.showBelowItems(index);
-		if(index == 0){		//end edit head view
-			String content = this.mHeadText.getText().toString();
-			if(content.length() == 0){
-				//start ani
-				this.mHeadView.startAnimation(translateAnimation);
-			} else {
-				this.updateHeadStatus(0);
-				this.status = HANDLE_NOTHING;
-				if(this.newItemListener != null)
-					this.newItemListener.createNewItem(OnCreateNewItemListener.CREATE_TOP, content);
-			}
-		} else if(index == this.getChildCount()){
-			String content = this.mFootText.getText().toString();
-			if(content.length() == 0){
-				//start ani
-				this.mFootView.startAnimation(translateAnimation);
-			} else {
-				if(this.newItemListener != null)
-					this.newItemListener.createNewItem(OnCreateNewItemListener.CREATE_BOTTOM, content);
-				this.status = HANDLE_NOTHING;
-				this.mFootText.setText(null);
-				this.mFootLinear.setVisibility(View.GONE);
-				this.mFootPlaceHolder.setVisibility(View.VISIBLE);
-			}
-		} else {
-			scrollToOrigin();
-		}
+		scrollToOrigin();
+//		if(index == 0){		//end edit head view
+//			String content = this.mHeadText.getText().toString();
+//			if(content.length() == 0){
+//				//start ani
+//				this.mHeadView.startAnimation(translateAnimation);
+//			} else {
+//				this.updateHeadStatus(0);
+//				this.status = HANDLE_NOTHING;
+//				if(this.newItemListener != null)
+//					this.newItemListener.createNewItem(OnCreateNewItemListener.CREATE_TOP, content);
+//			}
+//		} else if(index == this.getChildCount()){
+//			String content = this.mFootText.getText().toString();
+//			if(content.length() == 0){
+//				//start ani
+//				this.mFootView.startAnimation(translateAnimation);
+//			} else {
+//				if(this.newItemListener != null)
+//					this.newItemListener.createNewItem(OnCreateNewItemListener.CREATE_BOTTOM, content);
+//				this.status = HANDLE_NOTHING;
+//				this.mFootText.setText(null);
+//				this.mFootLinear.setVisibility(View.GONE);
+//				this.mFootPlaceHolder.setVisibility(View.VISIBLE);
+//			}
+//		} else {
+//		}
 	}
 	
 	private void scrollItemToTop(final int position){
@@ -634,7 +636,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.mFootPlaceHolder.setVisibility(View.GONE);
 				this.mFootImage.setVisibility(View.VISIBLE);
 				this.mFootImage.startAnimation(this.rotate3dAnimation);
-				this.status = HANDLE_FOOT;
+				this.status = HANDLE_ITEM_EDITING;
 				break;
 			}
 			View v = this.getChildAt(position - this.getFirstVisiblePosition());
@@ -654,9 +656,11 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 				this.headStatus = HEAD_DONE;
 				this.endEditItem(0);
 			}else if(this.headStatus == HEAD_RELEASE){
-				this.headStatus = HEAD_CREATING;
+				this.headStatus = HEAD_DONE;
 				this.updateHeadStatus(0);
-				this.startEditItem(0);
+				this.status = HANDLE_ITEM_EDITING;
+				this.newItemListener.createNewItem(1, "");
+				this.startEditItemHandler.sendEmptyMessageDelayed(1, 200);
 			}else if(this.headStatus == HEAD_SWITCH){
 					Log.v(TAG, "" + this.getHeight());
 					SwitchAnimation animation = new SwitchAnimation(this.mSwitchImage, this.mHeadView,
