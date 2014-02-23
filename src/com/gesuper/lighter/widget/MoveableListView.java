@@ -462,24 +462,28 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
 //		}
 	}
 	
-	private void scrollItemToTop(final int position){
+	private void scrollItemToTop(int position){
 		ViewGroup.LayoutParams p = this.mFootPlaceHolder.getLayoutParams();
 		p.height = this.screenHeight;
 		this.mFootPlaceHolder.setLayoutParams(p);
 		this.scrollStart = this.getScrollY();
 		this.scrollEnd = - this.currentItem.getTop();
-		SmoothScrollAnimation smoothScroll = new SmoothScrollAnimation(this, this.scrollStart, this.scrollEnd, SmoothScrollAnimation.SCROLL_TOP);
-		smoothScroll.setDuration(300);
-		smoothScroll.setAnimationListener(new AnimationListener(){
-			public void onAnimationEnd(Animation arg0) {
-				// TODO Auto-generated method stub
-				MoveableListView.this.currentItem.startEdit();
-			}
-			public void onAnimationRepeat(Animation arg0) {}
-			public void onAnimationStart(Animation arg0) {}
-			
-		});
-		this.startAnimation(smoothScroll);
+		if(Math.abs(this.scrollStart - this.scrollEnd) > 10){
+			SmoothScrollAnimation smoothScroll = new SmoothScrollAnimation(this, this.scrollStart, this.scrollEnd, SmoothScrollAnimation.SCROLL_TOP);
+			smoothScroll.setDuration(300);
+			smoothScroll.setAnimationListener(new AnimationListener(){
+				public void onAnimationEnd(Animation arg0) {
+					// TODO Auto-generated method stub
+					MoveableListView.this.currentItem.startEdit();
+				}
+				public void onAnimationRepeat(Animation arg0) {}
+				public void onAnimationStart(Animation arg0) {}
+				
+			});
+			this.startAnimation(smoothScroll);
+		} else {
+			this.currentItem.startEdit();
+		}
 	}
 	
 	private void scrollToOrigin(){

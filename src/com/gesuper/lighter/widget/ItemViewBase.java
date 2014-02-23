@@ -96,6 +96,7 @@ public class ItemViewBase extends LinearLayout {
 		// TODO Auto-generated method stub
 		this.mContentEt.setVisibility(View.GONE);
 		this.mContentTv.setVisibility(View.VISIBLE);
+		Log.v(TAG, "endedit " + this.mContentEt.getText() + " " + model.getId() + " " + isEvent);
 		if(this.mContentEt.getText().toString().length() == 0){
 			if(this.mContentTv.getText().toString().length() == 0){
 				return false;
@@ -112,7 +113,6 @@ public class ItemViewBase extends LinearLayout {
 		model.setContent(this.mContentEt.getText().toString());
 		Utils.saveItemContent(context, isEvent, model.getId(), this.mContentEt.getText().toString());
 		
-		Log.v(TAG, "endedit " + this.mContentEt.getText() + " " + model.getId() + " " + isEvent);
 		return true;
 	}
 	
