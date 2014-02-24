@@ -1008,9 +1008,7 @@ public class MoveableListView extends ListView implements OnTouchListener, OnMul
             // rotate
             camera = new Camera();
             camera.save();
-            camera.rotateX(angle);
-            camera.rotateY(0);
-            camera.rotateZ(0);
+            camera.rotate(angle,0,0);
             // translate
             camera.translate(0, 0, 0);
             matrix = new Matrix();
