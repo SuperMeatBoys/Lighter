@@ -7,6 +7,7 @@ import com.gesuper.lighter.tools.Utils;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -22,6 +24,7 @@ public class ItemViewBase extends LinearLayout {
 	public static final String TAG = "ItemViewBase";
 	private static final int NORMAL = 0;
 	private static final int FINISHED = 1;
+	
 	protected Context context;
 	protected ItemModelBase model;
 	protected EditText mContentEt;
@@ -31,6 +34,9 @@ public class ItemViewBase extends LinearLayout {
 	protected Rect focusRect;
 	private AlphaAnimation alphaAnimation;
 	private int status;
+	private LinearLayout createImageLinear;
+	private ImageView createImageUp;
+	private ImageView createImageDown;
 	
 	public ItemViewBase(Context context){
 		super(context);
@@ -47,12 +53,16 @@ public class ItemViewBase extends LinearLayout {
 
 	private void initResource() {
 		// TODO Auto-generated method stub
+		this.createImageLinear = (LinearLayout) this.findViewById(R.id.item_create_image);
+		this.createImageUp = (ImageView) this.findViewById(R.id.item_create_image_up);
+		this.createImageDown = (ImageView) this.findViewById(R.id.item_create_image_down);
+		
 		this.mContentLinear = (LinearLayout)findViewById(R.id.item_linear);
 		this.mContentEt = (EditText)findViewById(R.id.item_content_et);
 		this.mContentTv = (TextView)findViewById(R.id.item_content_tv);
-		ViewGroup.LayoutParams p = this.mContentLinear.getLayoutParams();
-		p.width = 480;
-		this.mContentLinear.setLayoutParams(p);
+//		ViewGroup.LayoutParams p = this.mContentLinear.getLayoutParams();
+//		p.width = 480;
+//		this.mContentLinear.setLayoutParams(p);
 		
 		this.focusRect = new Rect();
 		this.alphaAnimation = new AlphaAnimation(1.0F, 0.5F);
@@ -114,6 +124,43 @@ public class ItemViewBase extends LinearLayout {
 		Utils.saveItemContent(context, isEvent, model.getId(), this.mContentEt.getText().toString());
 		
 		return true;
+	}
+	
+	public void createSplitImage(Bitmap map, float y){
+		if(Utils.getItemHeight(this.context) == (int)Math.abs(y)){
+			this.createImageUp.setImageBitmap(map);
+    		this.createImageDown.setImageBitmap(null);
+    		return ;
+		}
+		
+    	Bitmap upImage = Utils.roateImageView(map, 0, -y, 0);
+    	Bitmap downImage = Utils.roateImageView(map, 0, y, 0);
+	    if(upImage != null && downImage != null){
+	        try{
+	    		upImage = Bitmap.createBitmap(upImage, 0, 0, upImage.getWidth(), upImage.getHeight()/2, null, false);
+	    		downImage = Bitmap.createBitmap(downImage, 0, downImage.getHeight()/2, downImage.getWidth(), downImage.getHeight()/2, null, false);
+	    		this.createImageUp.setImageBitmap(upImage);
+	    		this.createImageDown.setImageBitmap(downImage);
+
+	    	} catch (IllegalArgumentException e) {
+	    		e.printStackTrace();
+	    	}
+	    }
+    }
+	
+	public void setCreateLinearPadding(int left, int top, int right, int bottom){
+		this.createImageLinear.setPadding(left, top, right, bottom);
+	}
+	
+	public void startCreateState(){
+		this.createImageLinear.setVisibility(View.VISIBLE);
+	}
+	
+	public void endCreateState(){
+		this.createImageLinear.setVisibility(View.GONE);
+		this.createImageUp.setImageBitmap(null);
+		this.createImageDown.setImageBitmap(null);
+		this.createImageLinear.setPadding(0, 0, 0, 0);
 	}
 	
 	public void calcFocusRect(){

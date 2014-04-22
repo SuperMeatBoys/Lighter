@@ -49,10 +49,10 @@ public class EventListAdapter extends BaseAdapter{
 			mItemView = (EventItemView) convertView;
 		}
 		else mItemView  = new EventItemView(this.context);
-
 		EventModel mItemModel = this.listItems.get(position);
 		mItemModel.setSequence(position);
 		mItemView.setModel(mItemModel);
+		Log.v(TAG, mItemModel.getContent());
 		mItemView.setBgColor(((MainActivity) this.context).calculateColor(position));
 		if(position == 0){
 			View v = mItemView.findViewById(R.id.item_linear_bg);

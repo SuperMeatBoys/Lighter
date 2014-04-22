@@ -1,5 +1,6 @@
 package com.gesuper.lighter.tools;
 
+import com.gesuper.lighter.R;
 import com.gesuper.lighter.model.CaseModel;
 import com.gesuper.lighter.model.EventModel;
 import com.gesuper.lighter.model.ItemModelBase;
@@ -11,7 +12,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Camera;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -23,7 +26,16 @@ import android.view.animation.Animation.AnimationListener;
 
 public class Utils {
 	public static String TAG = "Utils";
+	private static int ITEM_HEIGHT = -1;
 	//change color from hsl to rgb
+	
+	public static int getItemHeight(Context context){
+		if(ITEM_HEIGHT < 0){
+			ITEM_HEIGHT = (int) context.getResources().getDimension(R.dimen.item_height);
+		}
+		return ITEM_HEIGHT;
+	}
+	
 	public static int HSLToRGB(double h, double s, double l){
 		double R,G,B;
 	    double var_1, var_2;
@@ -190,4 +202,34 @@ public class Utils {
 		cv.put(ItemModelBase.MODIFY_DATE, System.currentTimeMillis());
 		dbHelper.update(isEvent?DbHelper.TABLE.EVENTS:DbHelper.TABLE.CASES, cv, ItemModelBase.ID + " = " + itemId, null);
 	}
+	
+    public static Bitmap roateImageView(Bitmap bitmap, float x, float y, float z){
+    	float angle = (float) (Math.acos(y / bitmap.getHeight())*(180/Math.PI));
+    	Camera camera = new Camera();
+        camera.save();
+        Matrix matrix = new Matrix();
+        Bitmap belowBit = null;
+        try {
+            // rotate
+            camera = new Camera();
+            camera.save();
+            camera.rotate(angle,0,0);
+            // translate
+            camera.translate(0, 0, 0);
+            matrix = new Matrix();
+            camera.getMatrix(matrix);
+            // 恢复到之前的初始状态。
+            camera.restore();
+            // 设置图像处理的中心点
+            int w = bitmap.getWidth()/2;
+            matrix.preTranslate(-w, 0);
+            matrix.postTranslate(w, 0);
+            belowBit = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return null;
+        }
+        
+        return belowBit;
+    }
 }
